@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Linux Command Line Hacker Academy",
   description: "An interactive, source-grounded Linux command-line learning and practice system with chapters, labs, achievements, quizzes, and local progress tracking.",
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+  other: { "codex-preview": "development" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

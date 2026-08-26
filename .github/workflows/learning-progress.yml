@@ -1,0 +1,28 @@
+name: Verify learning progress
+
+on:
+  push:
+    paths:
+      - "LEARNING.md"
+      - "learning/**"
+      - ".agents/**"
+      - "scripts/academy.py"
+      - ".github/workflows/learning-progress.yml"
+  pull_request:
+    paths:
+      - "LEARNING.md"
+      - "learning/**"
+      - ".agents/**"
+      - "scripts/academy.py"
+      - ".github/workflows/learning-progress.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate state and generated progress
+        run: python3 scripts/academy.py verify

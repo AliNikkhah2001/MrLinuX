@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "profile": {
+    "mission": "Build durable Linux command-line fluency.",
+    "pace": "Set during $start-linux-learning.",
+    "goal": "Explain commands, test safely, and verify evidence."
+  },
+  "chapters": [
+    {
+      "number": 1,
+      "id": "mental-model",
+      "title": "Why commands look impossible",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 2,
+      "id": "command-anatomy",
+      "title": "Command anatomy & execution",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 3,
+      "id": "quoting-expansion",
+      "title": "Tokens, quoting & expansion",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 4,
+      "id": "streams-pipelines",
+      "title": "Streams, pipes & control lists",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 5,
+      "id": "filesystem-tree",
+      "title": "The filesystem as a tree",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 6,
+      "id": "file-operations",
+      "title": "Copy, move, delete & archive",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 7,
+      "id": "permissions",
+      "title": "Permissions & least privilege",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 8,
+      "id": "find-metadata",
+      "title": "Finding files & metadata",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 9,
+      "id": "text-regex",
+      "title": "Text, records & regex",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 10,
+      "id": "grep-selection",
+      "title": "Selection with grep",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 11,
+      "id": "filter-toolkit",
+      "title": "The core filter toolkit",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 12,
+      "id": "sed-awk",
+      "title": "Transforming with sed & awk",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 13,
+      "id": "processes-signals",
+      "title": "Processes, jobs & signals",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 14,
+      "id": "systemd-logs",
+      "title": "Services & logs with systemd",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 15,
+      "id": "networking-cli",
+      "title": "Networking from the CLI",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 16,
+      "id": "storage-packages",
+      "title": "Storage, packages & system facts",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 17,
+      "id": "script-fundamentals",
+      "title": "Script fundamentals & data",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 18,
+      "id": "decisions-loops",
+      "title": "Tests, loops & functions",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 19,
+      "id": "reliable-scripts",
+      "title": "Reliable scripts & boundaries",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    },
+    {
+      "number": 20,
+      "id": "fluency-system",
+      "title": "Discovery, debugging & fluency",
+      "status": "not-started",
+      "best_score": null,
+      "last_studied": null,
+      "summary": ""
+    }
+  ],
+  "activity": {},
+  "sessions": [],
+  "mistakes": [],
+  "sources": [],
+  "matrix_end": "2026-08-26"
+}

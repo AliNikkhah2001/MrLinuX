@@ -30,7 +30,18 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Lesson, lessons, videos } from "./course-data";
 
-type View = "dashboard" | "learn" | "lab" | "resources";
+type View = "dashboard" | "learn" | "lab" | "workbench" | "resources";
+
+type QuizMistake = {
+  id: string;
+  lessonId: string;
+  question: string;
+  chosen: string;
+  correct: string;
+  explanation: string;
+  createdAt: string;
+  reviewed: boolean;
+};
 
 type ProgressState = {
   completed: string[];
@@ -38,6 +49,8 @@ type ProgressState = {
   labs: string[];
   activity: Record<string, number>;
   lastLesson: string;
+  notes: Record<string, string>;
+  mistakes: QuizMistake[];
 };
 
 const STORAGE_KEY = "linux-hacker-academy-v1";
@@ -48,6 +61,8 @@ const emptyProgress: ProgressState = {
   labs: [],
   activity: {},
   lastLesson: lessons[0].id,
+  notes: {},
+  mistakes: [],
 };
 
 const decoderMissions = [
@@ -177,6 +192,7 @@ function Dashboard({ progress, setView, openLesson }: { progress: ProgressState;
           <div className="hero-actions">
             <button className="primary-button" onClick={() => openLesson(nextLesson.id)}><CirclePlay size={18} /> Continue: Ch. {String(nextLesson.number).padStart(2, "0")}</button>
             <button className="ghost-button" onClick={() => setView("lab")}><TerminalSquare size={18} /> Enter practice lab</button>
+            <button className="ghost-button" onClick={() => setView("workbench")}><Code2 size={18} /> Open AI workbench</button>
           </div>
         </div>
       </section>
@@ -237,7 +253,7 @@ function LessonReader({ lesson, progress, selectLesson, toggleComplete, submitQu
   progress: ProgressState;
   selectLesson: (id: string) => void;
   toggleComplete: (id: string) => void;
-  submitQuiz: (id: string, correct: boolean) => void;
+  submitQuiz: (lesson: Lesson, selected: number) => void;
   completeLab: (id: string) => void;
 }) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -252,9 +268,8 @@ function LessonReader({ lesson, progress, selectLesson, toggleComplete, submitQu
 
   const checkAnswer = () => {
     if (selectedAnswer === null) return;
-    const correct = selectedAnswer === lesson.quiz.correct;
     setRevealed(true);
-    submitQuiz(lesson.id, correct);
+    submitQuiz(lesson, selectedAnswer);
   };
 
   return (
@@ -329,7 +344,7 @@ function LearnView({ progress, activeLesson, setActiveLesson, actions }: {
   progress: ProgressState;
   activeLesson: string;
   setActiveLesson: (id: string) => void;
-  actions: { toggleComplete: (id: string) => void; submitQuiz: (id: string, correct: boolean) => void; completeLab: (id: string) => void };
+  actions: { toggleComplete: (id: string) => void; submitQuiz: (lesson: Lesson, selected: number) => void; completeLab: (id: string) => void };
 }) {
   const [query, setQuery] = useState("");
   const [mobileMap, setMobileMap] = useState(false);
@@ -383,6 +398,70 @@ mission ${mission.label}/0${decoderMissions.length} :: ${solved ? "CLEARED" : "A
   );
 }
 
+function WorkbenchView({ progress, updateNote, toggleMistake }: {
+  progress: ProgressState;
+  updateNote: (lessonId: string, note: string) => void;
+  toggleMistake: (id: string) => void;
+}) {
+  const [noteLesson, setNoteLesson] = useState(progress.lastLesson || lessons[0].id);
+  const selectedLesson = lessons.find((lesson) => lesson.id === noteLesson) ?? lessons[0];
+  const pending = progress.mistakes.filter((mistake) => !mistake.reviewed).length;
+
+  return (
+    <div className="view-stack workbench-view">
+      <section className="page-heading"><span className="kicker">[ CLONE · LEARN · RECORD · COMMIT ]</span><h1>AI learning workbench</h1><p>The browser gives you a local notebook and automatic quiz review. Clone the repository when you want a local AI tutor to fill durable notes, sources, scores, and mistakes that can be committed and pushed to GitHub.</p></section>
+
+      <section className="workbench-hero">
+        <div className="code-window repo-terminal"><div className="window-bar"><i /><i /><i /><span>academy@local:~/linux-hacker-academy</span></div><pre><code>{`git clone https://github.com/YOU/linux-hacker-academy.git
+cd linux-hacker-academy
+codex
+
+$start-linux-learning
+$learn-linux
+$check-linux-understanding`}</code></pre></div>
+        <div className="panel repo-model">
+          <span className="eyebrow">DURABLE LOOP</span><h2>Repository as learning memory</h2>
+          <ol><li><b>01</b><span><strong>read</strong> chapter source + current state</span></li><li><b>02</b><span><strong>practice</strong> in a safe local sandbox</span></li><li><b>03</b><span><strong>retrieve</strong> with quiz + mistake review</span></li><li><b>04</b><span><strong>checkpoint</strong> notes and progress with Git</span></li></ol>
+        </div>
+      </section>
+
+      <section className="workbench-files panel">
+        <div className="panel-heading"><div><span className="eyebrow">AGENTIC FILE MAP</span><h2>Everything needed after clone</h2></div><span className="mono-muted">local-first · auditable</span></div>
+        <div className="file-grid">
+          <div><code>AGENTS.md</code><p>Safety, source-of-truth, and Git checkpoint rules for the tutor.</p></div>
+          <div><code>.agents/skills/</code><p>Start, teach, and understanding-check workflows discovered by Codex.</p></div>
+          <div><code>learning/state.json</code><p>Structured chapter, score, activity, source, and review state.</p></div>
+          <div><code>LEARNING.md</code><p>Human-readable mission, current position, chapter table, and review queue.</p></div>
+          <div><code>learning/notes/</code><p>Dated chapter notes created during AI-led sessions.</p></div>
+          <div><code>learning/PROGRESS.md</code><p>GitHub-readable 84-day matrix and recent session ledger.</p></div>
+        </div>
+      </section>
+
+      <div className="workbench-columns">
+        <section className="panel notebook-panel">
+          <div className="panel-heading"><div><span className="eyebrow">BROWSER NOTEBOOK</span><h2>Chapter field notes</h2></div><span className="autosave"><span /> autosaved locally</span></div>
+          <label className="chapter-select"><span>active chapter</span><select value={noteLesson} onChange={(event) => setNoteLesson(event.target.value)}>{lessons.map((lesson) => <option key={lesson.id} value={lesson.id}>{String(lesson.number).padStart(2, "0")} — {lesson.title}</option>)}</select></label>
+          <textarea value={progress.notes[selectedLesson.id] ?? ""} onChange={(event) => updateNote(selectedLesson.id, event.target.value)} placeholder={`Mental model:\nCommand I can explain:\nEvidence I checked:\nQuestion to revisit:`} aria-label={`Notes for ${selectedLesson.title}`} />
+          <p>These notes stay in this browser. In a cloned repo, the AI tutor writes the Git-backed version to <code>learning/notes/</code>.</p>
+        </section>
+
+        <section className="panel mistakes-panel">
+          <div className="panel-heading"><div><span className="eyebrow">MISTAKES REVIEW</span><h2>{pending} retrieval item{pending === 1 ? "" : "s"}</h2></div><Target size={23} className="heading-icon" /></div>
+          {progress.mistakes.length === 0 ? <div className="empty-review"><Check size={25} /><strong>queue empty</strong><p>A wrong quiz answer will appear here with your choice, the correct answer, and the chapter explanation.</p></div> : <div className="mistake-list">{progress.mistakes.map((mistake) => {
+            const lesson = lessons.find((item) => item.id === mistake.lessonId);
+            return <article key={mistake.id} className={mistake.reviewed ? "reviewed" : ""}><div><span>CH. {String(lesson?.number ?? 0).padStart(2, "0")}</span><small>{mistake.createdAt}</small></div><h3>{mistake.question}</h3><p><b>your answer:</b> {mistake.chosen}</p><p><b>correct:</b> {mistake.correct}</p><div className="mistake-explanation">{mistake.explanation}</div><label><Checkbox checked={mistake.reviewed} onCheckedChange={() => toggleMistake(mistake.id)} /><span>{mistake.reviewed ? "reviewed" : "mark reviewed"}</span></label></article>;
+          })}</div>}
+        </section>
+      </div>
+
+      <section className="checkpoint-panel panel"><div><span className="eyebrow">GIT CHECKPOINT</span><h2>Progress becomes a contribution</h2><p>Review the AI-generated changes before recording them. The tutor is instructed never to push automatically.</p></div><pre><code>{`python3 scripts/academy.py verify
+git add LEARNING.md learning/
+git commit -m "learn(chapter-01): record session"
+git push`}</code></pre></section>
+    </div>
+  );
+}
+
 function ResourcesView() {
   const sourceGroups = [
     { title: "The Linux Command Line", tag: "FREE BOOK · 596 PAGES", detail: "William Shotts' beginner-to-practitioner progression through shell use, common tools, redirection, expansion, and scripting.", url: "https://linuxcommand.org/tlcl.php" },
@@ -391,6 +470,7 @@ function ResourcesView() {
     { title: "GNU Coreutils Manual", tag: "UTILITY CONTRACTS", detail: "Precise GNU behavior for ls, cp, mv, rm, sort, uniq, cut, text formatting, and system context tools.", url: "https://www.gnu.org/software/coreutils/manual/coreutils.html" },
     { title: "Linux man-pages", tag: "SYSTEM INTERFACES", detail: "Manual pages for Linux user-space APIs and the foundation for reading installed documentation by section.", url: "https://man7.org/linux/man-pages/" },
     { title: "OverTheWire Bandit", tag: "CHALLENGE LOOP", detail: "A beginner-oriented environment for practicing inspection, hypothesis, manual lookup, testing, and transfer.", url: "https://overthewire.org/wargames/bandit/" },
+    { title: "AI Engineering from Scratch", tag: "WORKBENCH PATTERN", detail: "The open repository whose lesson, skill, durable state, evidence, and verification pattern inspired this academy's original Linux-focused workbench adaptation.", url: "https://github.com/rohitg00/ai-engineering-from-scratch" },
   ];
   return (
     <div className="view-stack resources-view">
@@ -412,6 +492,8 @@ export default function Home() {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       const parsed = saved ? { ...emptyProgress, ...JSON.parse(saved) } as ProgressState : emptyProgress;
+      parsed.notes = parsed.notes ?? {};
+      parsed.mistakes = parsed.mistakes ?? [];
       const today = localDate();
       parsed.activity = { ...parsed.activity, [today]: Math.min((parsed.activity[today] ?? 0) + 1, 4) };
       setProgress(parsed);
@@ -433,8 +515,28 @@ export default function Home() {
   const setLesson = (id: string) => { setActiveLesson(id); setProgress((current) => ({ ...current, lastLesson: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const openLesson = (id: string) => { setLesson(id); setView("learn"); };
   const toggleComplete = (id: string) => recordAction((current) => ({ ...current, completed: current.completed.includes(id) ? current.completed.filter((item) => item !== id) : [...current.completed, id] }));
-  const submitQuiz = (id: string, correct: boolean) => recordAction((current) => ({ ...current, quizScores: { ...current.quizScores, [id]: Math.max(current.quizScores[id] ?? 0, correct ? 1 : 0) } }));
+  const submitQuiz = (lesson: Lesson, selected: number) => recordAction((current) => {
+    const correct = selected === lesson.quiz.correct;
+    const alreadyRecorded = current.mistakes.some((mistake) => mistake.lessonId === lesson.id && mistake.chosen === lesson.quiz.options[selected] && !mistake.reviewed);
+    const mistake: QuizMistake = {
+      id: `${lesson.id}-${Date.now()}`,
+      lessonId: lesson.id,
+      question: lesson.quiz.question,
+      chosen: lesson.quiz.options[selected],
+      correct: lesson.quiz.options[lesson.quiz.correct],
+      explanation: lesson.quiz.explanation,
+      createdAt: localDate(),
+      reviewed: false,
+    };
+    return {
+      ...current,
+      quizScores: { ...current.quizScores, [lesson.id]: Math.max(current.quizScores[lesson.id] ?? 0, correct ? 1 : 0) },
+      mistakes: !correct && !alreadyRecorded ? [mistake, ...current.mistakes] : current.mistakes,
+    };
+  });
   const completeLab = (id: string) => recordAction((current) => ({ ...current, labs: current.labs.includes(id) ? current.labs : [...current.labs, id] }));
+  const updateNote = (lessonId: string, note: string) => setProgress((current) => ({ ...current, notes: { ...current.notes, [lessonId]: note } }));
+  const toggleMistake = (id: string) => recordAction((current) => ({ ...current, mistakes: current.mistakes.map((mistake) => mistake.id === id ? { ...mistake, reviewed: !mistake.reviewed } : mistake) }));
 
   const exportProgress = () => {
     const payload = JSON.stringify({ exportedAt: new Date().toISOString(), ...progress }, null, 2);
@@ -449,7 +551,7 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={() => setView("dashboard")} aria-label="Linux Hacker Academy dashboard"><span className="brand-mark">&gt;_</span><span><strong>LINUX//ACADEMY</strong><small>COMMAND-LINE MASTERY SYSTEM</small></span></button>
-        <Tabs value={view} onValueChange={(value) => setView(value as View)} className="nav-tabs"><TabsList variant="line"><TabsTrigger value="dashboard"><LayoutDashboard size={16} /> dashboard</TabsTrigger><TabsTrigger value="learn"><BookOpen size={16} /> learn</TabsTrigger><TabsTrigger value="lab"><TerminalSquare size={16} /> practice</TabsTrigger><TabsTrigger value="resources"><CirclePlay size={16} /> sources</TabsTrigger></TabsList></Tabs>
+        <Tabs value={view} onValueChange={(value) => setView(value as View)} className="nav-tabs"><TabsList variant="line"><TabsTrigger value="dashboard"><LayoutDashboard size={16} /> dashboard</TabsTrigger><TabsTrigger value="learn"><BookOpen size={16} /> learn</TabsTrigger><TabsTrigger value="lab"><TerminalSquare size={16} /> practice</TabsTrigger><TabsTrigger value="workbench"><Code2 size={16} /> workbench</TabsTrigger><TabsTrigger value="resources"><CirclePlay size={16} /> sources</TabsTrigger></TabsList></Tabs>
         <div className="user-strip"><button onClick={exportProgress} title="Export progress" aria-label="Export progress"><Download size={17} /></button><span><Zap size={15} /> {xp} XP</span><div className="avatar">LN</div></div>
       </header>
 
@@ -457,6 +559,7 @@ export default function Home() {
         <TabsContent value="dashboard"><Dashboard progress={progress} setView={setView} openLesson={openLesson} /></TabsContent>
         <TabsContent value="learn"><LearnView progress={progress} activeLesson={activeLesson} setActiveLesson={setLesson} actions={{ toggleComplete, submitQuiz, completeLab }} /></TabsContent>
         <TabsContent value="lab"><PracticeLab progress={progress} completeLab={completeLab} /></TabsContent>
+        <TabsContent value="workbench"><WorkbenchView progress={progress} updateNote={updateNote} toggleMistake={toggleMistake} /></TabsContent>
         <TabsContent value="resources"><ResourcesView /></TabsContent>
       </Tabs>
 
