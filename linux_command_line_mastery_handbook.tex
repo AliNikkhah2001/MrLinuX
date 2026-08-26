@@ -1,0 +1,3160 @@
+% The Linux Command Line: From Syntax Confusion to Fluency
+% Complete standalone LaTeX source. Compile with: latexmk -pdf linux_command_line_mastery_handbook.tex
+\documentclass[11pt,oneside,openany]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,margin=24mm,headheight=16pt]{geometry}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{needspace}
+\usepackage{lastpage}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\usepackage{bookmark}
+
+\definecolor{Navy}{HTML}{172A46}
+\definecolor{Blue}{HTML}{2267A5}
+\definecolor{Cyan}{HTML}{1B8A9B}
+\definecolor{Mint}{HTML}{E8F5F2}
+\definecolor{Gold}{HTML}{D89714}
+\definecolor{Warm}{HTML}{FFF6E5}
+\definecolor{Red}{HTML}{B33A3A}
+\definecolor{Rose}{HTML}{FFF0F0}
+\definecolor{Ink}{HTML}{202833}
+\definecolor{Muted}{HTML}{5D6978}
+\definecolor{Paper}{HTML}{F7F9FC}
+\definecolor{CodeBg}{HTML}{101923}
+\definecolor{CodeFg}{HTML}{E7EDF4}
+\definecolor{CodeGreen}{HTML}{8FD694}
+\definecolor{CodeBlue}{HTML}{86C5FF}
+\definecolor{CodeGold}{HTML}{FFD479}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Blue,
+  urlcolor=Cyan,
+  citecolor=Blue,
+  pdftitle={The Linux Command Line: From Syntax Confusion to Fluency},
+  pdfauthor={OpenAI},
+  pdfsubject={A mental model, grammar, and practice guide to the Linux command line},
+  pdfkeywords={Linux, Bash, shell, POSIX, command line, scripting, practice}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist{nosep,leftmargin=1.6em}
+\renewcommand{\arraystretch}{1.18}
+\raggedbottom
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\color{Navy}}
+  {\filleft\Large\color{Cyan}\MakeUppercase{Chapter \thechapter}}
+  {0.5ex}
+  {\titlerule[1.2pt]\vspace{1ex}\LARGE}
+\titlespacing*{\chapter}{0pt}{-24pt}{26pt}
+\titleformat{\section}{\Large\bfseries\color{Navy}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\large\bfseries\color{Blue}}{\thesubsection}{0.7em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{Muted}\nouppercase{\leftmark}}
+\fancyhead[R]{\small\color{Muted}\nouppercase{\rightmark}}
+\fancyfoot[L]{\small\color{Muted}Linux Command Line Mastery}
+\fancyfoot[R]{\small\color{Muted}\thepage\ / \pageref*{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[L]{\small\color{Muted}Linux Command Line Mastery}
+  \fancyfoot[R]{\small\color{Muted}\thepage\ / \pageref*{LastPage}}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+\lstdefinestyle{shell}{
+  language=bash,
+  backgroundcolor=\color{CodeBg},
+  basicstyle=\ttfamily\small\color{CodeFg},
+  keywordstyle=\bfseries\color{CodeBlue},
+  commentstyle=\itshape\color{CodeGreen},
+  stringstyle=\color{CodeGold},
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  upquote=true,
+  frame=single,
+  rulecolor=\color{CodeBg},
+  framerule=0pt,
+  xleftmargin=1mm,
+  xrightmargin=1mm,
+  aboveskip=0.8em,
+  belowskip=0.8em
+}
+\lstset{style=shell}
+
+\newtcolorbox{mentalmodel}[1][]{
+  enhanced,breakable,colback=Mint,colframe=Cyan,boxrule=0.8pt,
+  arc=2mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+  title={Mental model},fonttitle=\bfseries,#1
+}
+\newtcolorbox{warningbox}[1][]{
+  enhanced,breakable,colback=Rose,colframe=Red,boxrule=0.8pt,
+  arc=2mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+  title={Safety rail},fonttitle=\bfseries,#1
+}
+\newtcolorbox{practicebox}[1][]{
+  enhanced,breakable,colback=Paper,colframe=Blue,boxrule=0.8pt,
+  arc=2mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+  title={Practice},fonttitle=\bfseries,#1
+}
+\newtcolorbox{recapbox}[1][]{
+  enhanced,breakable,colback=Warm,colframe=Gold,boxrule=0.8pt,
+  arc=2mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+  title={Chapter recap},fonttitle=\bfseries,#1
+}
+\newtcolorbox{questionbox}[1][]{
+  enhanced,breakable,colback=white,colframe=Navy,boxrule=1pt,
+  arc=2mm,left=4mm,right=4mm,top=3mm,bottom=3mm,
+  fonttitle=\bfseries,coltitle=white,colbacktitle=Navy,#1
+}
+\newtcolorbox{answerbox}[1][]{
+  enhanced,breakable,colback=Mint,colframe=Cyan,boxrule=0.7pt,
+  arc=2mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+  title={Answer and reasoning},fonttitle=\bfseries,#1
+}
+\newtcolorbox{sourcebox}[1][]{
+  enhanced,breakable,colback=Paper,colframe=Muted,boxrule=0.5pt,
+  arc=1mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+  title={Standards note},fonttitle=\bfseries,#1
+}
+
+\newcommand{\difficulty}[1]{\textsf{\bfseries\color{Gold}#1}}
+\newcommand{\shellword}[1]{\texttt{#1}}
+\newcommand{\term}[1]{\textbf{\color{Navy}#1}}
+\newcommand{\fourchoices}[4]{%
+  \begin{enumerate}[label=\Alph*),leftmargin=2em,itemsep=0.25em]
+    \item #1
+    \item #2
+    \item #3
+    \item #4
+  \end{enumerate}}
+\newcommand{\chaptergoals}[1]{%
+  \begin{tcolorbox}[colback=Paper,colframe=Blue,title={Learning outcomes},fonttitle=\bfseries]
+  #1
+  \end{tcolorbox}}
+
+\begin{document}
+
+\frontmatter
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+  \pagecolor{Navy}
+  \color{white}
+  \vspace*{17mm}
+  {\Large\sffamily\bfseries MENTAL MODEL \textbullet\ GRAMMAR \textbullet\ PRACTICE\par}
+  \vspace{14mm}
+  {\fontsize{34}{40}\selectfont\bfseries The Linux\\Command Line\par}
+  \vspace{5mm}
+  {\fontsize{22}{28}\selectfont From Syntax Confusion to Fluency\par}
+  \vspace{10mm}
+  {\Large A Mental Model, Grammar, and Practice Guide\par}
+  \vfill
+  \begin{tcolorbox}[colback=white!8!Navy,colframe=Cyan,boxrule=1.2pt,arc=3mm]
+    \color{white}\large
+    A structured handbook for learning how the shell parses commands, how Unix tools compose, how to investigate unfamiliar systems, and how to build reliable Bash scripts.
+  \end{tcolorbox}
+  \vfill
+  {\large Complete course edition \textbullet\ 2026\par}
+  {\normalsize Original explanations and exercises; source-grounded and standards-aware.\par}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+\nopagecolor
+\color{Ink}
+
+\chapter*{How to use this handbook}
+\addcontentsline{toc}{chapter}{How to use this handbook}
+This book is designed around a single change in perspective: a command line is not a magic phrase to memorize. It is a small program that the shell reads according to grammar. Commands provide the vocabulary; quoting and expansion shape the words; redirections connect file descriptors; operators connect decisions; pipelines connect programs.
+
+Work in three passes:
+\begin{enumerate}
+  \item \textbf{Read for a model.} Before copying an example, predict which program receives which arguments and where each stream goes.
+  \item \textbf{Run in a disposable lab.} Most exercises use \texttt{\$HOME/clm-lab}. Create it once and remain inside it for file-changing practice.
+  \item \textbf{Retrieve from memory.} Complete the recap and boxed questions without looking back. Then explain every wrong option, not only the right one.
+\end{enumerate}
+
+\begin{warningbox}[title={The safe-lab rule}]
+Commands such as \texttt{rm}, \texttt{chmod}, \texttt{chown}, \texttt{kill}, package managers, and service controls can change or remove real data. In this book, destructive practice belongs only in a directory you created for practice. Print the target with \texttt{pwd}, preview selections with non-destructive commands, quote variables, and use the least privilege necessary. Never paste an unexplained command into an important system.
+\end{warningbox}
+
+\section*{Set up the lab}
+\begin{lstlisting}
+mkdir -p "$HOME/clm-lab"
+cd "$HOME/clm-lab"
+printf 'alpha\nbeta\nerror: demo\n' > sample.txt
+pwd
+ls -la
+\end{lstlisting}
+
+The examples assume GNU/Linux with Bash. POSIX-portable behavior is identified where it matters. A command's installed version and manual page remain authoritative for that machine.
+
+\chapter*{Scope, sources, and originality}
+\addcontentsline{toc}{chapter}{Scope, sources, and originality}
+This is an original teaching work. It synthesizes ideas and factual behavior from authoritative references; it does not reproduce their chapters. Command behavior is explained in new language and demonstrated with newly written examples.
+
+\begin{longtable}{>{\bfseries}p{0.23\textwidth}p{0.69\textwidth}}
+\toprule
+Source & How it informs this handbook \\
+\midrule
+\endfirsthead
+\toprule
+Source & How it informs this handbook \\
+\midrule
+\endhead
+William Shotts, \emph{The Linux Command Line}, Seventh Internet Edition & Beginner-to-practitioner progression; shell philosophy; common utilities; redirection, pipelines, expansion, and scripting. Official page: \url{https://linuxcommand.org/tlcl.php}. The official site describes a 596-page free edition released under CC BY-NC-ND. \\
+GNU Bash Reference Manual & Bash parsing, quoting, expansions, compound commands, parameters, arrays, job control, redirections, functions, and shell options. \url{https://www.gnu.org/software/bash/manual/bash.html} \\
+POSIX.1-2024, Shell and Utilities & The portable shell-language baseline: token recognition, quoting, expansions, redirection, command search/execution, exit status, and standard utilities. \url{https://pubs.opengroup.org/onlinepubs/9799919799/} \\
+GNU Coreutils Manual & GNU behavior for file, text, and system utilities such as \texttt{ls}, \texttt{cp}, \texttt{mv}, \texttt{rm}, \texttt{sort}, \texttt{uniq}, and \texttt{cut}. \url{https://www.gnu.org/software/coreutils/manual/coreutils.html} \\
+Linux man-pages project & The manual-page system and Linux user-space interfaces. \url{https://man7.org/linux/man-pages/} \\
+OverTheWire Bandit & The challenge-based learning loop: inspect, form a hypothesis, consult manuals, test, record, and transfer the lesson. Bandit is explicitly aimed at absolute beginners. \url{https://overthewire.org/wargames/bandit/} \\
+systemd documentation and installed manual pages & Service and journal workflows, with the important distinction between human-readable status output and machine-oriented properties. \url{https://systemd.io/} \\
+\bottomrule
+\end{longtable}
+
+\begin{sourcebox}
+The report was checked against the official source pages listed above on 25 August 2026. Linux distributions can patch tools and ship different versions. Verify operational details with \texttt{man}, \texttt{info}, \texttt{help}, and \texttt{--version} on the target machine.
+\end{sourcebox}
+
+\section*{What “complete” means here}
+No finite book contains every Linux command. Completeness here means that you receive the durable mental models, grammar, core command families, discovery skills, reliability habits, and practice system needed to understand unfamiliar commands without starting over. Specialized domains such as kernel development, database administration, cloud platforms, and offensive security each require their own references.
+
+\tableofcontents
+
+\mainmatter
+\part{Foundations: Build the Right Mental Model}
+
+\chapter{Why Linux Commands Look Impossible}
+\chaptergoals{By the end of this chapter you can separate kernel, shell, terminal, utilities, and scripts; explain why short commands exist; and replace memorization with parsing.}
+
+\section{Five layers people casually call “Linux”}
+A terminal session feels like one thing, but several components cooperate:
+\begin{description}[style=nextline,leftmargin=2em]
+  \item[Terminal emulator] The window or text interface that displays characters and sends keystrokes. Examples include GNOME Terminal, Konsole, and a remote pseudo-terminal created by SSH.
+  \item[Shell] A command-language interpreter such as Bash, Dash, Zsh, or Fish. It reads text, performs expansions and redirections, and starts commands.
+  \item[Utilities] Programs such as \texttt{ls}, \texttt{grep}, \texttt{find}, and \texttt{ss}. Some are external executables; some commands, such as \texttt{cd}, are shell builtins.
+  \item[Kernel] The privileged core that manages processes, memory, devices, filesystems, networking, and system calls. A shell is not the kernel.
+  \item[Scripts] Saved programs written in a shell language or another interpreter. A script combines commands with variables, decisions, repetition, and functions.
+\end{description}
+
+\begin{mentalmodel}
+The terminal is the desk, the shell is the language interpreter, utilities are tools, and the kernel is the machinery behind the wall. A typed line is first a shell-language statement, not immediately a kernel instruction.
+\end{mentalmodel}
+
+\section{Why the vocabulary is short}
+Early Unix systems were built for slow terminals and small machines. Short names reduced typing and fit a culture of composable tools: \texttt{cp} copies, \texttt{mv} moves, \texttt{rm} removes, and \texttt{wc} counts. The names are terse, but their repeated grammar makes them learnable.
+
+The real difficulty is visual compression. This line contains three programs and two shell operators:
+\begin{lstlisting}
+ps aux | grep nginx || printf 'nginx not found\n'
+\end{lstlisting}
+Read it as a sentence:
+\begin{enumerate}
+  \item Ask \texttt{ps} for a process snapshot.
+  \item Send its standard output through a pipeline to \texttt{grep}.
+  \item If the pipeline's status is failure, run \texttt{printf} as a fallback.
+\end{enumerate}
+
+\section{Vocabulary, grammar, and composition}
+\begin{center}
+\begin{tabularx}{0.94\textwidth}{>{\bfseries\color{Navy}}p{0.19\textwidth}X p{0.28\textwidth}}
+\toprule
+Layer & Question to ask & Example \\
+\midrule
+Vocabulary & What does this command do? & \texttt{grep} selects matching lines. \\
+Arguments & What objects or values does it receive? & \texttt{ERROR}, \texttt{app.log} \\
+Options & How is behavior modified? & \texttt{-i} ignores case. \\
+Grammar & What will the shell do before execution? & Expand \texttt{*.log}; interpret \texttt{|}. \\
+Composition & How do stages exchange data and status? & stdout flows into stdin; \texttt{\&\&} tests success. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Why memorization fails}
+A memorized command is fragile: one changed path, space, quotation mark, or option can make it wrong. A parsed command is adaptable. For every command line, ask:
+\begin{enumerate}
+  \item Which tokens are shell syntax?
+  \item Which word names the command?
+  \item What exact argument vector will the command receive after expansion?
+  \item Where do file descriptors 0, 1, and 2 point?
+  \item What exit status controls the next operator?
+\end{enumerate}
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- identify the layers}]
+Open a terminal and run \texttt{type cd}, \texttt{type ls}, and \texttt{type printf}. Record which are builtins on your shell and which resolve to files or aliases.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- narrate a command}]
+Explain, in ordinary language, each stage and operator in:
+\begin{lstlisting}
+find . -type f -name '*.txt' | wc -l
+\end{lstlisting}
+Then predict the type of data that crosses the pipe.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- locate responsibility}]
+Suppose \texttt{echo *.log} prints several names. Which component interpreted the asterisk: \texttt{echo}, the terminal, or the shell? Design a comparison using a quoted pattern to test your answer.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 1.1 -- Architecture}]
+Which statement is most accurate?
+\fourchoices{The terminal parses Bash grammar.}{The kernel expands wildcard patterns.}{The shell expands syntax and launches utilities.}{Every command is a shell builtin.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{C.} The shell interprets its language, performs expansions and redirections, and requests process execution. Terminal display and kernel services are different layers.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 1.2 -- Responsibility}]
+In \texttt{grep ERROR *.log}, who normally expands \texttt{*.log} into filenames?
+\fourchoices{The shell, before launching \texttt{grep}.}{\texttt{grep}, after opening the directory.}{The filesystem driver.}{The terminal emulator.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} Pathname expansion is a shell expansion. \texttt{grep} normally receives the resulting filenames as separate arguments.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Linux command-line work spans a terminal, a shell, utilities, the kernel, and scripts.
+  \item Commands are vocabulary; shell syntax is grammar; pipelines and lists create composition.
+  \item Fluency comes from predicting tokens, arguments, streams, and status, not from memorizing strings.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Command Anatomy and the Execution Model}
+\chaptergoals{You can read a synopsis, distinguish options from operands, inspect command resolution, understand \texttt{argv}, and use exit status as data.}
+
+\section{The useful first approximation}
+Most simple commands resemble:
+\begin{lstlisting}
+command [options] [operands]
+ls -lah /etc
+\end{lstlisting}
+Here \texttt{ls} is the command name, \texttt{-lah} is a cluster of short options, and \texttt{/etc} is an operand naming the object to list. This is a convention, not the complete shell grammar. Assignments and redirections may appear too; option styles vary; and a command decides how to interpret its own arguments.
+
+\begin{mentalmodel}
+The shell creates a list of strings. Conventionally, the program sees them as \texttt{argv[0]}, \texttt{argv[1]}, and so on. The shell does not know that \texttt{-l} means “long format”; \texttt{ls} gives it that meaning.
+\end{mentalmodel}
+
+\section{Options, operands, and the end-of-options marker}
+Common option forms include:
+\begin{itemize}
+  \item short: \texttt{-a}
+  \item clustered short options: \texttt{-lah}, often equivalent to \texttt{-l -a -h}
+  \item long: \texttt{--all}
+  \item option with value: \texttt{--color=auto} or \texttt{-n 20}
+\end{itemize}
+These are utility conventions rather than universal shell rules. A name beginning with a hyphen can be mistaken for an option. Many utilities accept \texttt{--} to end option parsing:
+\begin{lstlisting}
+printf '%s\n' content > ./-notes
+rm -- ./-notes
+\end{lstlisting}
+The explicit \texttt{./} path is also a useful disambiguation.
+
+\section{How a name resolves}
+Run \texttt{type -a name} to discover whether a name is an alias, function, builtin, hashed path, or executable. Bash generally considers shell constructs and functions/builtins before searching directories in \texttt{PATH} for external programs. Use \texttt{command -V name} for a descriptive result and \texttt{command -v name} for script-friendly discovery.
+\begin{lstlisting}
+type -a printf
+command -V cd
+command -v python3
+printf '%s\n' "$PATH" | tr ':' '\n'
+\end{lstlisting}
+\texttt{which} is common but is not the best model of shell resolution; it often searches \texttt{PATH} without fully representing aliases, functions, or builtins.
+
+\section{Exit status}
+Every completed command produces an integer status. By convention, zero means success and nonzero means some form of failure or negative result. Immediately after a foreground pipeline, Bash exposes its status as \texttt{\$?}:
+\begin{lstlisting}
+grep -q 'error' sample.txt
+status=$?
+printf 'status=%s\n' "$status"
+\end{lstlisting}
+Capture it immediately: the next command replaces \texttt{\$?}. Do not assume every nonzero value means the same thing. For example, \texttt{grep} distinguishes “no selected line” from an operational error; consult its manual.
+
+\section{Reading a manual synopsis}
+Manual-page notation usually means:
+\begin{itemize}
+  \item square brackets: optional material;
+  \item ellipsis: repetition is allowed;
+  \item vertical alternatives: choose one form;
+  \item bold or literal text: type it as shown;
+  \item underlined/italic metavariables: substitute an appropriate value.
+\end{itemize}
+The brackets in a synopsis usually describe the interface; they are not characters to type.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- resolve names}]
+Run \texttt{type -a echo}, \texttt{type -a test}, \texttt{type -a ls}, and \texttt{command -v sh}. Explain why one name may have multiple resolutions.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- test option termination}]
+Inside \texttt{\$HOME/clm-lab}, create a file named \texttt{-draft} using \texttt{touch -- -draft}. List it safely, then remove it with an explicit \texttt{--}. Explain both protections.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- status protocol}]
+Write a three-command experiment that distinguishes a found match, no match, and a missing input file for \texttt{grep}. Record the status immediately after each call and use the manual to interpret it.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 2.1 -- Option parsing}]
+What is the most common purpose of \texttt{--} in a utility invocation?
+\fourchoices{Enable every long option.}{End option parsing so later words are operands.}{Join two commands.}{Request Bash compatibility mode.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} The convention protects operands such as filenames that begin with a hyphen. Support is utility-specific but widespread.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 2.2 -- Status lifetime}]
+Which sequence reliably stores the status of \texttt{build}?
+\fourchoices{\texttt{build; printf x; s=\$?}}{\texttt{build; s=\$?}}{\texttt{s=\$?; build}}{\texttt{build \& s=\$?}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Status must be captured immediately. In A, \texttt{printf} replaces it; C captures an earlier status; D launches asynchronously and captures the launch/list status rather than the final job result.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item The shell passes strings; the command interprets option and operand meaning.
+  \item \texttt{type} and \texttt{command -v/-V} reveal how a name resolves.
+  \item Zero conventionally means success; interpret nonzero codes using the command's contract.
+\end{itemize}
+\end{recapbox}
+
+\part{Shell Grammar: How Bash Reads a Line}
+
+\chapter{Tokens, Quoting, and Expansion}
+\chaptergoals{You can explain the shell's expansion pipeline, predict word splitting and globbing, choose correct quotation, and handle arbitrary filenames safely.}
+
+\section{A practical expansion pipeline}
+Bash parsing is precisely specified and has important edge cases. For daily reasoning, use this simplified model:
+\begin{enumerate}
+  \item Read and tokenize shell syntax; recognize quotes and operators.
+  \item Parse tokens into commands and compound structures.
+  \item Perform expansions: braces; tilde; parameters; command substitution; arithmetic; then word splitting and pathname expansion where applicable.
+  \item Remove quote characters, apply redirections, and execute.
+\end{enumerate}
+The exact ordering and contexts matter. The Bash manual is authoritative for Bash; the POSIX Shell Command Language is the portability baseline.
+
+\section{The three quoting tools}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\ttfamily}p{0.15\textwidth}X X}
+\toprule
+Syntax & Protects & Important exception \\
+\midrule
+\textbackslash & The next character & A backslash-newline pair can continue a line. \\
+'single' & Everything between the quotes & A literal single quote cannot appear directly inside. \\
+"double" & Spaces and most metacharacters while allowing selected expansions & \texttt{\$}, command substitution, and certain backslashes retain meaning. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The default rule for parameter expansions is simple and powerful: \textbf{quote them unless you specifically need splitting or globbing}.
+\begin{lstlisting}
+name='Ada Lovelace'
+printf '<%s>\n' "$name"     # one argument
+printf '<%s>\n' $name       # two words after splitting
+\end{lstlisting}
+
+\section{Parameter expansion}
+Useful forms include:
+\begin{longtable}{>{\ttfamily}p{0.28\textwidth}p{0.64\textwidth}}
+\toprule
+Form & Meaning \\
+\midrule
+\endfirsthead
+\toprule Form & Meaning \\
+\midrule\endhead
+\$name, \${name} & Expand a parameter; braces separate the name from adjacent text. \\
+\${name:-default} & Use default when unset or null; do not assign it. \\
+\${name:=default} & Use and assign default when unset or null. \\
+\${name:?message} & Stop with a diagnostic when unset or null. \\
+\${\#name} & Length of the value. \\
+\${name\#pattern} & Remove shortest matching prefix. \\
+\${name\%pattern} & Remove shortest matching suffix. \\
+\${name//old/new} & Bash replacement of all matches. \\
+\bottomrule
+\end{longtable}
+
+\begin{lstlisting}
+report=${REPORT_NAME:-daily.txt}
+: "${CONFIG_FILE:?set CONFIG_FILE to a readable path}"
+base=${path##*/}
+stem=${base%.*}
+\end{lstlisting}
+The colon is a builtin that does nothing successfully, but its arguments are still expanded; this makes it useful for validation expansions.
+
+\section{Command and arithmetic substitution}
+Command substitution captures standard output, removes trailing newlines, and substitutes the result:
+\begin{lstlisting}
+today=$(date +%F)
+printf 'date=%s\n' "$today"
+\end{lstlisting}
+Prefer \texttt{\$(...)} over legacy backticks because nesting and quotation are clearer. Arithmetic expansion evaluates shell arithmetic:
+\begin{lstlisting}
+next=$((count + 1))
+\end{lstlisting}
+
+\section{Globs are not regular expressions}
+Shell patterns commonly use \texttt{*} for any string, \texttt{?} for one character, and bracket expressions such as \texttt{[0-9]}. The shell expands an unquoted pathname pattern before execution.
+\begin{lstlisting}
+printf '%s\n' ./*.log
+printf '%s\n' "*.log"       # literal asterisk
+\end{lstlisting}
+Behavior when nothing matches depends on shell and options. In default Bash, an unmatched pattern often remains literal. Scripts should design for that reality, use Bash's \texttt{nullglob} carefully, or avoid glob-dependent ambiguity.
+
+\section{Arbitrary filenames}
+Newlines and spaces are legal in filenames. Parsing \texttt{ls} output is unreliable. Prefer NUL-delimited records when connecting filename-producing and filename-consuming tools:
+\begin{lstlisting}
+find . -type f -print0 | xargs -0 -- sha256sum
+\end{lstlisting}
+For a Bash loop, use a NUL-aware read:
+\begin{lstlisting}
+while IFS= read -r -d '' file; do
+  printf 'file: %q\n' "$file"
+done < <(find . -type f -print0)
+\end{lstlisting}
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- quotation prediction}]
+Set \texttt{x='one two'} and predict the argument count for \texttt{printf '<\%s>\textbackslash n' "\$x"} versus the unquoted form. Run both.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- decompose paths}]
+Given \texttt{path=/srv/app/archive.tar.gz}, use parameter expansion to obtain \texttt{archive.tar.gz}, then remove only the final suffix, then remove the longest suffix beginning with a dot. Explain \texttt{\%} versus \texttt{\%\%}.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- hostile filenames}]
+In the lab, create files containing spaces and leading hyphens. Build a \texttt{find -print0} pipeline that prints SHA-256 hashes without treating names as options. Explain why newline-delimited text is not a universal filename protocol.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 3.1 -- Double quotes}]
+If \texttt{x='a b'}, what is normally passed by \texttt{printf '<\%s>\textbackslash n' "\$x"}?
+\fourchoices{Two arguments, \texttt{a} and \texttt{b}.}{One data argument containing \texttt{a b}.}{The literal characters \texttt{\$x}.}{No argument because spaces are invalid.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Double quotes preserve the expanded value as one word while allowing parameter expansion.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 3.2 -- Command substitution}]
+Which statement about \texttt{result=\$(command)} is correct?
+\fourchoices{It captures standard error by default.}{It captures standard output and removes trailing newlines.}{It preserves every output byte including NUL.}{It stores the exit status rather than output.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Standard error remains separate unless redirected. Shell variables cannot represent NUL bytes, and the command status is available separately.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Quoting changes the shell's interpretation before a utility runs.
+  \item Double-quote parameter and command substitutions unless splitting or globbing is intentional.
+  \item Globs and regular expressions are different pattern languages.
+  \item Use NUL-delimited pipelines when filenames must be handled without ambiguity.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Streams, Redirection, Pipelines, and Lists}
+\chaptergoals{You can track file descriptors 0/1/2, redirect in the correct order, use pipelines and conditionals, and reason about pipeline exit status.}
+
+\section{The three conventional streams}
+Processes commonly begin with three open file descriptors:
+\begin{center}
+\begin{tabularx}{0.9\textwidth}{>{\bfseries}p{0.16\textwidth}>{\ttfamily}p{0.14\textwidth}X}
+\toprule
+Name & Number & Normal destination/source \\
+\midrule
+standard input & 0 & keyboard or upstream pipeline \\
+standard output & 1 & terminal or downstream pipeline \\
+standard error & 2 & terminal, kept separate for diagnostics \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{mentalmodel}
+Redirection rewires file descriptors. A pipeline connects one process's descriptor 1 to the next process's descriptor 0. These connections are prepared before the command executes.
+\end{mentalmodel}
+
+\section{Core redirections}
+\begin{longtable}{>{\ttfamily}p{0.26\textwidth}p{0.66\textwidth}}
+\toprule
+Syntax & Effect \\
+\midrule
+\endfirsthead\toprule Syntax & Effect \\
+\midrule\endhead
+command > file & Send stdout to a file, truncating it first. \\
+command >> file & Append stdout. \\
+command < file & Read stdin from a file. \\
+command 2> file & Send stderr to a file. \\
+command >file 2>\&1 & Send stdout to file, then make stderr point where stdout points. \\
+command 2>\&1 >file & Send stderr to stdout's old destination, then redirect stdout; often not the intended result. \\
+command \&> file & Bash shorthand for both stdout and stderr to one file. \\
+command 2>/dev/null & Discard diagnostics; use sparingly because it can hide real errors. \\
+\bottomrule
+\end{longtable}
+
+Redirections are processed from left to right. “Descriptor 2 becomes a duplicate of descriptor 1” is more accurate than “send errors to the same filename.”
+
+\section{Pipelines}
+\begin{lstlisting}
+producer | transformer | consumer
+printf '%s\n' beta alpha beta | sort | uniq -c
+\end{lstlisting}
+Each stage normally runs in its own process. The pipe carries stdout only; stderr remains visible unless explicitly redirected. The final consumer may stop early, and upstream programs can receive a broken-pipe signal. This is normal composition, not necessarily a bug.
+
+By default, Bash reports the status of the final pipeline stage. With \texttt{set -o pipefail}, the pipeline is unsuccessful if a stage fails, with Bash selecting the status of the rightmost failed command. The \texttt{PIPESTATUS} array records each stage immediately after the pipeline.
+\begin{lstlisting}
+set -o pipefail
+generate | transform | save
+printf 'pipeline=%s stages=%s\n' "$?" "${PIPESTATUS[*]}"
+\end{lstlisting}
+In that exact example, reading \texttt{\$?} before \texttt{PIPESTATUS} can itself disturb later status inspection. In real diagnostics, copy \texttt{PIPESTATUS} immediately:
+\begin{lstlisting}
+generate | transform | save
+stage_status=("${PIPESTATUS[@]}")
+printf '%s\n' "${stage_status[*]}"
+\end{lstlisting}
+
+\section{Lists and control operators}
+\begin{center}
+\begin{tabularx}{0.95\textwidth}{>{\ttfamily}p{0.13\textwidth}X p{0.34\textwidth}}
+\toprule
+Operator & Meaning & Example \\
+\midrule
+; & Run the next list regardless of status. & \texttt{date; whoami} \\
+\&\& & Run the right side only if the left succeeds. & \texttt{mkdir out \&\& cd out} \\
+|| & Run the right side only if the left fails. & \texttt{test -e x || touch x} \\
+\& & Run asynchronously in the background. & \texttt{long-task \&} \\
+| & Connect stdout to the next stdin. & \texttt{journalctl | less} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\texttt{\&\&} and \texttt{||} have equal precedence in shell lists and associate left-to-right. Long mixed chains are hard to review; use an \texttt{if} statement when the intention is not obvious.
+
+\section{Grouping}
+Parentheses create a subshell; braces group commands in the current shell. Braces require separators around their contents and before the closing brace.
+\begin{lstlisting}
+( cd /tmp && printf '%s\n' "$PWD" )   # parent directory unchanged
+{ date; whoami; } > session.txt        # one redirection for the group
+\end{lstlisting}
+
+\section{Case study: is port 8091 available?}
+\begin{lstlisting}
+ss -ltnp | grep -q ':8091' || printf '8091 is free\n'
+\end{lstlisting}
+Read the line carefully:
+\begin{itemize}
+  \item \texttt{ss} reports socket information.
+  \item \texttt{-l} selects listening sockets, \texttt{-t} TCP, \texttt{-n} numeric display, and \texttt{-p} process information when permitted.
+  \item The pipe sends stdout to \texttt{grep}; \texttt{-q} asks only for match status.
+  \item The fallback prints only when the pipeline is nonzero.
+\end{itemize}
+This is a useful probe but not a reservation: another process can bind the port after the check. It may also miss context-specific cases such as network namespaces or insufficient permissions. Treat it as observation, not proof of future availability.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- split streams}]
+Run a command that names one existing and one missing path. Redirect stdout and stderr to different files, then inspect both.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- order matters}]
+Compare \texttt{command >all.log 2>\&1} with \texttt{command 2>\&1 >out.log}. Draw the destination of descriptors 1 and 2 after each redirection.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- pipeline truth}]
+Construct a pipeline whose early stage fails but whose final stage succeeds. Compare default status, \texttt{pipefail}, and the copied \texttt{PIPESTATUS} array.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 4.1 -- Redirection order}]
+What does \texttt{task >run.log 2>\&1} do?
+\fourchoices{Only stderr goes to \texttt{run.log}.}{Both stdout and stderr go to \texttt{run.log}.}{stderr becomes input.}{The command runs twice.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} First stdout points to the file; then stderr duplicates stdout's current destination.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 4.2 -- Pipeline status}]
+With Bash's default settings, what status does \texttt{a | b | c} normally report?
+\fourchoices{The first nonzero status.}{The largest status.}{The status of \texttt{c}.}{Always zero if a pipe was created.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{C.} Bash normally uses the final stage. \texttt{pipefail} changes the policy, and \texttt{PIPESTATUS} exposes all stages if copied immediately.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Track stdin, stdout, and stderr as numbered file descriptors.
+  \item Redirections are applied left-to-right; duplication captures the current destination.
+  \item Pipelines move data; \texttt{\&\&} and \texttt{||} move control based on status.
+  \item A check observes current state; it does not reserve a future state.
+\end{itemize}
+\end{recapbox}
+
+\part{Files, Paths, Permissions, and Search}
+
+\chapter{The Filesystem as a Tree}
+\chaptergoals{You can reason about absolute and relative paths, navigate predictably, inspect directory entries, and understand links and mount points.}
+
+\section{One rooted namespace}
+Linux exposes files and directories through a single tree rooted at \texttt{/}. A separate disk is normally attached at a directory called a \term{mount point}; it does not need a drive letter. A path is a route through that namespace.
+
+\begin{center}
+\begin{tabularx}{0.94\textwidth}{>{\ttfamily}p{0.23\textwidth}X}
+\toprule
+Path & Interpretation \\
+\midrule
+/var/log/app.log & Absolute: begin at the root directory. \\
+docs/guide.txt & Relative: begin at the current directory. \\
+./script & Explicitly name an entry in the current directory. \\
+../archive & Begin in the parent of the current directory. \\
+\$HOME/project & Expand the home-directory variable, then continue. \\
+~/project & Tilde expansion for the current user's home in supported shells. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Linux filenames are case-sensitive on common filesystems. \texttt{Report}, \texttt{report}, and \texttt{REPORT} can be different entries. The slash separates path components; NUL cannot occur in a pathname component.
+
+\section{Navigation with invariants}
+\begin{lstlisting}
+pwd                  # print the current working directory
+cd /var/log          # move using an absolute path
+cd ..                # parent
+cd -                 # previous working directory in Bash
+cd                   # home directory
+\end{lstlisting}
+\texttt{cd} must change the shell's own state, so it is normally a builtin. An external child process could change its own directory, but not the parent shell's current directory.
+
+Use \texttt{pwd -P} when you need a physical path with symbolic links resolved, and \texttt{pwd -L} for the logical route tracked by the shell. The distinction becomes visible after entering a directory through a symbolic link.
+
+\section{Reading \texttt{ls} output}
+\texttt{ls -l} shows metadata in fields: type/permission bits, link count, owner, group, size, timestamp, and name. \texttt{-a} includes names beginning with a dot; \texttt{-h} makes sizes human-readable when combined with a size-showing format.
+\begin{lstlisting}
+ls -lah
+ls -ld /etc          # inspect the directory entry, not its contents
+ls -li sample.txt    # include inode number
+\end{lstlisting}
+Human-oriented \texttt{ls} output is not a stable data format. Scripts should use purpose-built interfaces such as \texttt{find}, \texttt{stat}, shell globs, or NUL-delimited records.
+
+\section{Important top-level directories}
+Exact layouts vary, but these anchors are widely useful:
+\begin{longtable}{>{\ttfamily}p{0.2\textwidth}p{0.72\textwidth}}
+\toprule
+Directory & Typical role \\
+\midrule
+\endfirsthead\toprule Directory & Typical role \\
+\midrule\endhead
+/etc & System-wide configuration. \\
+/home & Regular users' home directories. \\
+/root & The superuser's home, not the root of the filesystem. \\
+/var & Variable data such as logs, caches, queues, and application state. \\
+/tmp & Temporary files; lifetime and cleanup policy vary. \\
+/run & Volatile runtime state since boot. \\
+/usr & Most user-space programs, libraries, documentation, and shared data. \\
+/bin, /sbin & Essential command locations; often symbolic links into \texttt{/usr}. \\
+/dev & Device nodes and special interfaces. \\
+/proc & A virtual view of processes and kernel state. \\
+/sys & A virtual view of devices, drivers, and kernel objects. \\
+/mnt, /media & Conventional mount locations. \\
+\bottomrule
+\end{longtable}
+
+\section{Links and identity}
+A directory entry maps a name to an inode-like filesystem object. A \term{hard link} is another directory entry for the same file object; a \term{symbolic link} is a small object containing a path to another name.
+\begin{lstlisting}
+ln original.txt hard-name.txt
+ln -s original.txt symbolic-name.txt
+readlink symbolic-name.txt
+readlink -f symbolic-name.txt
+\end{lstlisting}
+Hard links usually cannot cross filesystems and normally cannot target directories. Removing one hard link removes only that name; data remains while another hard link or open reference exists. A symbolic link can cross filesystems and can become dangling.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- relative routes}]
+In the lab, create \texttt{project/docs} and \texttt{project/data}. From \texttt{project/docs}, reach \texttt{data} using a relative path, then print both logical and physical working directories.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- link experiment}]
+Create a file, a hard link, and a symbolic link. Compare \texttt{ls -li}. Rename the original and observe which link still resolves. Explain the result.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- mount-aware reasoning}]
+Use \texttt{findmnt} or \texttt{mount} read-only output to identify which filesystem contains your home directory. Explain why a hard link to a file on a different filesystem is normally rejected.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 5.1 -- Paths}]
+What determines the starting point for \texttt{logs/app.log}?
+\fourchoices{The root directory.}{The current working directory.}{The home directory regardless of context.}{The directory containing \texttt{ls}.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} A path without a leading slash is relative to the process's current working directory.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 5.2 -- Links}]
+After creating a hard link, what do the two names normally share?
+\fourchoices{Only identical text copied at creation.}{The same underlying filesystem object.}{A stored path from one name to the other.}{Only the same owner name, not data.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Hard-linked names refer to the same underlying file object. A symbolic link, by contrast, stores a pathname.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Absolute paths start at \texttt{/}; relative paths start at the current directory.
+  \item A single namespace can contain many mounted filesystems.
+  \item Use \texttt{ls} for people and structured tools for scripts.
+  \item Hard links share an object; symbolic links point by pathname.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Creating, Copying, Moving, Deleting, and Archiving}
+\chaptergoals{You can perform file changes predictably, preview destructive selections, choose safe copy/move semantics, and create or inspect archives.}
+
+\section{Creation primitives}
+\begin{lstlisting}
+mkdir -p project/{src,docs,data}
+touch project/README.md
+printf '%s\n' '# Demo' > project/README.md
+install -d project/build
+\end{lstlisting}
+\texttt{touch} primarily updates timestamps; it creates a missing file as a useful side effect. \texttt{mkdir -p} creates missing parents and usually does not complain if the final directory already exists. Brace expansion is a shell feature that generates words before \texttt{mkdir} runs.
+
+\section{Copy semantics}
+\begin{lstlisting}
+cp source.txt destination.txt
+cp -i source.txt destination.txt
+cp -a project/ backup-project/
+cp -v source.txt destination.txt
+\end{lstlisting}
+Important questions are: Does the destination exist? Is it a directory? Are metadata and links preserved? Could the source and destination resolve to the same object? GNU \texttt{cp -a} is an archive-oriented preservation mode, but exact support is implementation-specific.
+
+For repeated tree synchronization, \texttt{rsync} is often clearer. A trailing slash on a source directory changes meaning:
+\begin{lstlisting}
+rsync -a --dry-run source/ destination/  # contents of source
+rsync -a --dry-run source destination/   # directory named source
+\end{lstlisting}
+Start with \texttt{--dry-run} and review deletions explicitly if considering \texttt{--delete}.
+
+\section{Move and rename}
+Within one filesystem, \texttt{mv} can often rename a directory entry atomically. Across filesystems, it may behave more like copy-and-remove.
+\begin{lstlisting}
+mv draft.txt final.txt
+mv -i final.txt archive/
+\end{lstlisting}
+Do not assume \texttt{mv} always means a cheap metadata change. The source/destination and filesystem boundary matter.
+
+\section{Deletion as an irreversible interface}
+\begin{warningbox}
+Command-line deletion commonly bypasses a desktop trash folder. Never construct a recursive deletion from an unchecked variable. First print the current directory, list the exact selection, and use explicit paths. Keep practice inside \texttt{\$HOME/clm-lab}.
+\end{warningbox}
+\begin{lstlisting}
+pwd
+find ./build -mindepth 1 -maxdepth 1 -print
+rm -i -- ./build/example.tmp
+rmdir -- ./empty-directory
+\end{lstlisting}
+\texttt{rmdir} removes empty directories. \texttt{rm -r} descends recursively; \texttt{-f} suppresses prompts and some errors. Because \texttt{-rf} removes safeguards, it should never be a reflex.
+
+Variables require validation and quotation:
+\begin{lstlisting}
+target=${1:?usage: cleanup DIRECTORY}
+case $target in
+  "$HOME/clm-lab/"*) ;;
+  *) printf 'refusing target: %s\n' "$target" >&2; exit 2 ;;
+esac
+find "$target" -mindepth 1 -maxdepth 1 -print
+\end{lstlisting}
+That code previews but does not delete. Real cleanup tools should also consider symbolic links, mount boundaries, races, and backups.
+
+\section{Archives and compression}
+An archive combines a tree into a stream; compression reduces representation size. \texttt{tar} can do both when paired with a compressor.
+\begin{lstlisting}
+tar -tf backup.tar                 # list without extracting
+tar -czf project.tar.gz project/   # create gzip-compressed archive
+mkdir -p restore
+tar -xzf project.tar.gz -C restore # extract into controlled directory
+\end{lstlisting}
+Inspect an untrusted archive before extraction. Paths containing \texttt{..}, absolute names, links, ownership, permissions, and overwrites can matter. Extract into a new, unprivileged directory.
+
+Common individual-file compressors include \texttt{gzip}, \texttt{xz}, and \texttt{zstd}; they do not by themselves preserve a directory tree. \texttt{zip} combines archiving and compression in a different format.
+
+\section{Checksums verify bytes, not trust}
+\begin{lstlisting}
+sha256sum project.tar.gz > project.tar.gz.sha256
+sha256sum -c project.tar.gz.sha256
+\end{lstlisting}
+A checksum detects accidental or malicious byte changes only if the expected checksum came through a trusted channel. A hash printed beside a download on the same compromised server is not independent authentication.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- copy and rename}]
+Create a three-file directory in the lab, copy it, rename one file in the copy, and use \texttt{diff -r} to describe the difference.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- archive lifecycle}]
+Create a compressed tar archive of the practice tree, list its contents, verify a checksum, extract into a new directory, and compare source and restoration.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- reason about synchronization}]
+Use \texttt{rsync -a --dry-run --itemize-changes} on two practice trees. Predict how adding/removing the source's trailing slash changes the destination layout. Do not use \texttt{--delete}.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 6.1 -- Archive inspection}]
+Which command lists a tar archive without extracting it?
+\fourchoices{\texttt{tar -tf backup.tar}}{\texttt{tar -xf backup.tar}}{\texttt{rm -r backup.tar}}{\texttt{gzip -d backup.tar}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} \texttt{t} lists and \texttt{f} identifies the archive file. Extraction uses \texttt{x}.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 6.2 -- Hash meaning}]
+A SHA-256 check matches a value fetched from the same untrusted server as the file. What is proven?
+\fourchoices{The publisher's identity.}{That the file is safe to execute.}{Only consistency with that supplied value, not independent authenticity.}{That no future vulnerability exists.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{C.} Integrity evidence is only as trustworthy as the expected digest's channel. Authenticity normally requires a trusted signature or independent source.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Resolve destination semantics before copying or moving.
+  \item Preview recursive selections and validate variables before deletion.
+  \item Inspect archives before extraction and restore into a controlled directory.
+  \item Checksums confirm byte equality; they do not automatically establish origin or safety.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Permissions, Ownership, and Least Privilege}
+\chaptergoals{You can decode mode bits, distinguish file and directory permissions, calculate symbolic/octal modes, use \texttt{umask}, and decide when elevated privilege is unnecessary.}
+
+\section{Identity and access checks}
+\begin{lstlisting}
+id
+groups
+namei -l /path/to/object
+stat -c '%A %a %U:%G %n' file
+\end{lstlisting}
+Traditional Unix discretionary access control considers an effective user, groups, object ownership, and mode bits. Additional layers may apply, including ACLs, SELinux, AppArmor, capabilities, mount options, containers, or remote-filesystem policy.
+
+\section{Read the mode string}
+An example mode \texttt{-rwxr-x---} divides into type plus three permission triplets:
+\begin{center}
+\begin{tabular}{c c c c}
+\toprule
+Type & owner & group & other \\
+\midrule
+\texttt{-} & \texttt{rwx} & \texttt{r-x} & \texttt{---} \\
+\bottomrule
+\end{tabular}
+\end{center}
+For a regular file, read means read bytes, write means modify bytes, and execute means request execution subject to format/interpreter and other controls. For a directory, the meanings change:
+\begin{itemize}
+  \item read: list directory names;
+  \item write: create, remove, or rename directory entries;
+  \item execute (search): traverse the directory and access entries whose names are known.
+\end{itemize}
+Removing a file is governed mainly by permissions on its containing directory, not the file's write bit.
+
+\section{Symbolic and numeric modes}
+\begin{lstlisting}
+chmod u+x script.sh
+chmod go-rwx private.txt
+chmod u=rw,g=r,o= report.txt
+chmod 640 report.txt
+\end{lstlisting}
+Numeric modes add read=4, write=2, execute=1 within owner/group/other. Thus \texttt{640} means owner 6 (read+write), group 4 (read), other 0.
+
+Avoid cargo-cult \texttt{chmod 777}. It grants every traditional permission to everyone and rarely expresses the real requirement. Choose the narrowest mode that supports the task.
+
+\section{Ownership and privilege}
+\texttt{chown user:group path} changes ownership when permitted, usually requiring elevated privilege. \texttt{sudo} runs a command under a configured policy, often as root. It is not punctuation to add when access fails.
+
+Before elevating, ask:
+\begin{enumerate}
+  \item Is this the correct path and file?
+  \item Should my user own or access it?
+  \item Is the failure caused by parent-directory traversal, a read-only mount, an ACL, or a security policy?
+  \item Can the task be done in a user-owned location?
+  \item What is the smallest command and scope requiring privilege?
+\end{enumerate}
+Never pipe unreviewed network content into a privileged shell.
+
+\section{Default permissions and \texttt{umask}}
+Programs request initial modes; the process's umask removes permission bits. Typical requests are 666 for regular files and 777 for directories, with execute intentionally absent from ordinary new files.
+\begin{lstlisting}
+umask
+umask 027
+mkdir team-private
+touch team-private/note
+stat -c '%a %n' team-private team-private/note
+\end{lstlisting}
+Think “requested mode minus masked bits,” although symbolic interactions are best verified empirically.
+
+\section{Special bits and ACL awareness}
+The setgid bit on a directory can make new entries inherit the directory's group, useful for collaboration. The sticky bit on a shared writable directory restricts who may remove entries, as commonly used on \texttt{/tmp}. Setuid on executables changes effective identity and deserves careful security review.
+
+An extra \texttt{+} in \texttt{ls -l} may indicate an ACL. Inspect with \texttt{getfacl}; modify with \texttt{setfacl} only when you understand both the ACL and mask entry. Mode bits alone may not explain the effective result.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- decode modes}]
+Translate \texttt{750}, \texttt{640}, and \texttt{711} into symbolic owner/group/other permissions. Then verify on lab files and directories.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- directory semantics}]
+On a lab directory, explore read and execute permissions separately using a second non-privileged test account only if your environment already provides one. Otherwise, reason from the manual and document expected listing versus traversal behavior.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- diagnose before elevation}]
+Use \texttt{namei -l} on a path with several parent directories. Explain how a missing search bit on any parent can block access even when the final file appears readable.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 7.1 -- Directory permission}]
+What does execute permission on a directory primarily allow?
+\fourchoices{Running every file inside.}{Traversing/searching the directory.}{Changing file contents regardless of ownership.}{Displaying file sizes only.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Directory execute is search/traversal permission. It is distinct from executing a regular file.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 7.2 -- Removing a file}]
+Which traditional permission is most directly relevant to removing a directory entry?
+\fourchoices{Write and search permission on the containing directory.}{Write permission on the file only.}{Execute permission on the file.}{Read permission on the file's group.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} Removal changes the parent directory. Sticky-bit, ACL, policy, mount, and ownership rules may add restrictions.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Permission letters mean different operations for files and directories.
+  \item Numeric modes are sums within owner, group, and other triplets.
+  \item \texttt{umask} removes bits from requested creation modes.
+  \item Diagnose path and policy layers before using elevated privilege.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Finding Files and Inspecting Metadata}
+\chaptergoals{You can build \texttt{find} expressions, distinguish discovery tools, handle matches safely, and inspect type, size, time, and filesystem usage.}
+
+\section{Choose the right discovery system}
+\begin{center}
+\begin{tabularx}{0.95\textwidth}{>{\ttfamily}p{0.2\textwidth}X}
+\toprule
+Tool & Best mental model \\
+\midrule
+find & Walk a live directory tree and test each entry. \\
+locate & Query a periodically updated pathname database; fast but possibly stale. \\
+command -v & Ask how the shell can resolve a command name. \\
+whereis & Search conventional locations for binaries, sources, and manuals. \\
+findmnt & Show the mount tree and filesystem relationships. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{The \texttt{find} grammar}
+A durable model is:
+\begin{lstlisting}
+find STARTING_POINTS EXPRESSION
+find /var/log -type f -name '*.log' -size +10M -print
+\end{lstlisting}
+The expression combines tests, actions, and operators. Adjacent tests imply logical AND. Use explicit parentheses, escaped from the shell, for grouping:
+\begin{lstlisting}
+find . -type f \( -name '*.md' -o -name '*.txt' \) -print
+\end{lstlisting}
+Without parentheses, precedence can select more than intended. Quote patterns so the shell does not expand them before \texttt{find} receives them.
+
+Useful tests:
+\begin{longtable}{>{\ttfamily}p{0.28\textwidth}p{0.64\textwidth}}
+\toprule
+Test & Meaning \\
+\midrule
+\endfirsthead\toprule Test & Meaning \\
+\midrule\endhead
+-type f / -type d / -type l & Regular file, directory, or symbolic link. \\
+-name pattern & Case-sensitive basename pattern. \\
+-iname pattern & GNU case-insensitive name pattern. \\
+-size +100M & Larger than 100 size units; rounding rules matter. \\
+-mtime -1 & Data-modification age in 24-hour periods; not exactly “today.” \\
+-newermt 'today' & GNU date-based comparison, clearer for calendar boundaries. \\
+-user name, -group name & Ownership tests. \\
+-perm mode & Permission tests; exact/all/any semantics depend on prefix. \\
+-maxdepth n & Limit descent depth (GNU and several implementations). \\
+-xdev & Do not descend into other filesystems. \\
+\bottomrule
+\end{longtable}
+
+\section{Actions and safe execution}
+\begin{lstlisting}
+find . -type f -name '*.tmp' -print
+find . -type f -name '*.txt' -exec wc -l -- {} +
+find . -type f -name '*.txt' -print0 | xargs -0 -- wc -l
+\end{lstlisting}
+\texttt{-exec ... {} +} batches many paths per invocation and avoids text parsing. \texttt{-exec ... {} \textbackslash;} invokes once per match. For deletion, preview the identical expression with \texttt{-print} first; action ordering and short-circuit behavior can affect results.
+
+\section{Metadata with \texttt{stat}, \texttt{file}, and disk tools}
+\begin{lstlisting}
+stat sample.txt
+file --mime-type sample.txt
+du -sh -- .
+df -h -- .
+lsblk -f
+\end{lstlisting}
+\texttt{du} walks selected directory entries and estimates their disk usage. \texttt{df} reports filesystem-level space. They answer different questions and can disagree due to sparse files, deleted-but-open files, reserved blocks, snapshots, compression, permissions, or measurement units.
+
+Time fields differ:
+\begin{itemize}
+  \item mtime: file data last modified;
+  \item ctime: inode status last changed, not “creation time”;
+  \item atime: last access under the filesystem's update policy;
+  \item birth/creation time: available only on supporting filesystems and interfaces.
+\end{itemize}
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- tree query}]
+Find all regular \texttt{.txt} files under the lab and print paths. Add a maximum depth and explain which entries disappear.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- modified today}]
+On GNU \texttt{find}, compare \texttt{-mtime -1} with \texttt{-newermt 'today'}. Create controlled files with \texttt{touch -d} if supported and explain the boundary difference.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- expression precedence}]
+Predict and then test the difference between \texttt{-type f -name '*.md' -o -name '*.txt'} and the parenthesized name alternatives followed by \texttt{-type f}. Explain implicit AND and OR precedence.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 8.1 -- Pattern quotation}]
+Why write \texttt{find . -name '*.log'} with quotes?
+\fourchoices{So \texttt{find}, not the shell, receives the pattern.}{To enable regular expressions.}{To make matching recursive.}{To include hidden files only.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} An unquoted glob may be expanded by the shell in the current directory before \texttt{find} starts.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 8.2 -- Disk reports}]
+Why can \texttt{du} and \texttt{df} legitimately disagree?
+\fourchoices{One of them must be corrupted.}{They measure directory-entry usage versus filesystem allocation/accounting.}{\texttt{df} reads only filenames.}{\texttt{du} always includes deleted open files.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} They observe different layers. Deleted-but-open data, sparse files, snapshots, and reserved blocks are common reasons for divergence.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item \texttt{find} walks live trees and evaluates an expression per entry.
+  \item Quote patterns and group mixed AND/OR expressions explicitly.
+  \item Prefer \texttt{-exec ... {} +} or NUL-delimited pipelines for arbitrary names.
+  \item \texttt{du} and \texttt{df} measure different layers of storage use.
+\end{itemize}
+\end{recapbox}
+
+\part{Text as a Universal Interface}
+
+\chapter{Text, Records, Encodings, and Regular Expressions}
+\chaptergoals{You can reason about lines and fields, distinguish bytes from characters, select the right regular-expression dialect, and avoid common locale and delimiter errors.}
+
+\section{Why text composes}
+Unix tools are powerful together because many accept a stream of records and emit another stream. The most common convention is one record per newline, with fields separated by spaces, tabs, colons, commas, or another delimiter. A pipeline succeeds when adjacent stages agree on the data contract.
+
+\begin{mentalmodel}
+A pipe transports bytes. “Lines,” “fields,” “characters,” JSON objects, and log entries are interpretations chosen by programs. Composition is reliable only when those interpretations match.
+\end{mentalmodel}
+
+\section{Bytes, characters, and locale}
+UTF-8 represents many characters using multiple bytes. Tools and options may count bytes, characters, or display columns differently. Locale affects character classes, collation order, case conversion, and sometimes decimal formats.
+\begin{lstlisting}
+locale
+printf '%b' 'z\n\303\244\na\n' | LC_ALL=C sort
+printf '%b' 'z\n\303\244\na\n' | sort
+\end{lstlisting}
+Set \texttt{LC\_ALL=C} for bytewise, reproducible behavior when that is the intended contract. Do not use it blindly for natural-language sorting.
+
+NUL is a special delimiter for pathnames because it cannot occur inside one. Newline is convenient for ordinary records but cannot represent arbitrary filenames without ambiguity.
+
+\section{Three pattern languages that look alike}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.22\textwidth}X X}
+\toprule
+Language & Typical user & Meaning of \texttt{*} \\
+\midrule
+Shell glob & pathname expansion, \texttt{case} & zero or more characters \\
+Basic regular expression (BRE) & default \texttt{grep}, many \texttt{sed} forms & repeat the preceding atom \\
+Extended regular expression (ERE) & \texttt{grep -E}, \texttt{awk} & repeat the preceding atom; adds convenient \texttt{+}, \texttt{?}, and alternation \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Thus shell \texttt{*.log} means “anything ending in .log,” while regex \texttt{.*\textbackslash.log\$} uses \texttt{.} for any character, \texttt{*} to repeat it, escapes the literal dot, and anchors the end.
+
+\section{Regex building blocks}
+\begin{longtable}{>{\ttfamily}p{0.25\textwidth}p{0.67\textwidth}}
+\toprule
+Pattern & Meaning in common ERE contexts \\
+\midrule
+\endfirsthead\toprule Pattern & Meaning \\
+\midrule\endhead
+\textasciicircum{} and \$ & Start and end of line. \\
+. & Any single character (subject to implementation/locale). \\
+\mbox{[abc]} & One listed character. \\
+\mbox{[\textasciicircum{}abc]} & One character not listed. \\
+\mbox{[[:digit:]]} & Locale-aware digit character class. \\
+x* & Zero or more \texttt{x}. \\
+x+ & One or more \texttt{x}. \\
+x? & Zero or one \texttt{x}. \\
+x\{m,n\} & A bounded repetition; exact escaping differs between BRE and ERE. \\
+x|y & Alternative in ERE. \\
+(...) & Grouping in ERE. \\
+\bottomrule
+\end{longtable}
+
+Use single quotes around regular expressions to stop the shell interpreting \texttt{\$}, brackets, backslashes, or spaces:
+\begin{lstlisting}
+printf '%s\n' '200 OK' '404 missing' | grep -E '^[45][0-9]{2} '
+\end{lstlisting}
+
+\section{Fixed strings are often the better tool}
+If the task is literal matching, request literal semantics:
+\begin{lstlisting}
+grep -F 'a.b[0]' input.txt
+grep -Fx 'READY' status.txt
+\end{lstlisting}
+\texttt{-F} avoids unintended regex metacharacters and can be faster. \texttt{-x} requires the whole line to match; \texttt{-w} uses a tool-defined word boundary and is not a substitute for every identifier rule.
+
+\section{Structured data deserves structured parsers}
+Avoid treating CSV, JSON, XML, or YAML as arbitrary lines when quoting, escapes, embedded newlines, or nesting matter. Prefer tools designed for the format, such as \texttt{jq} for JSON, a CSV-aware processor, or a language library. \texttt{grep} is excellent for selection in text; it is not a universal parser.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- glob or regex?}]
+For each pattern \texttt{*.txt}, \texttt{.*\textbackslash.txt\$}, and \texttt{\textasciicircum{}[[:digit:]]+\$}, identify the intended pattern language and describe it.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- anchors}]
+Create lines containing \texttt{ERROR}, \texttt{ERROR42}, and \texttt{not ERROR}. Write one fixed-string selection and one regex that matches only a complete line equal to \texttt{ERROR}.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- locale experiment}]
+Compare default-locale and \texttt{LC\_ALL=C} sorting for ASCII and non-ASCII text. Explain why reproducible machine pipelines may choose bytewise collation while user-facing lists may not.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 9.1 -- Literal matching}]
+Which option asks GNU \texttt{grep} to treat the pattern as fixed strings?
+\fourchoices{\texttt{-E}}{\texttt{-F}}{\texttt{-P}}{\texttt{-r}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} \texttt{-F} selects fixed-string matching. \texttt{-E} selects extended regular expressions; \texttt{-r} recurses.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 9.2 -- Data contract}]
+Why is newline-delimited output not a lossless protocol for arbitrary Unix pathnames?
+\fourchoices{Newlines cannot pass through pipes.}{A pathname may itself contain a newline.}{Linux removes newlines from names.}{Only root may read newline records.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Newline is legal within a filename, so it cannot unambiguously separate every pathname. NUL is the conventional lossless delimiter.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Pipes carry bytes; programs decide record and field meaning.
+  \item Globs, BREs, and EREs are different languages.
+  \item Use fixed-string matching for literal tasks and structured parsers for structured formats.
+  \item Locale is part of the data-processing environment.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Selection with \texttt{grep}}
+\chaptergoals{You can design precise searches, interpret selection status, recurse safely, include context, count correctly, and decide when not to use \texttt{grep}.}
+
+\section{The selection model}
+\begin{lstlisting}
+grep [OPTIONS] PATTERN [FILE...]
+grep -nF 'ERROR' app.log
+\end{lstlisting}
+Think: input records are lines; the predicate is a pattern; selected records go to stdout; diagnostics go to stderr; exit status communicates match/no-match/error.
+
+Core options:
+\begin{longtable}{>{\ttfamily}p{0.22\textwidth}p{0.7\textwidth}}
+\toprule
+Option & Purpose \\
+\midrule
+\endfirsthead\toprule Option & Purpose \\
+\midrule\endhead
+-n & Prefix line numbers. \\
+-i & Ignore case under locale rules. \\
+-v & Invert selection. \\
+-F & Fixed strings. \\
+-E & Extended regular expressions. \\
+-x & Require a whole-line match. \\
+-q & Quiet; report by status rather than selected output. \\
+-c & Count selected lines per input, not occurrences. \\
+-l / -L & Print filenames with / without selected lines. \\
+-r & Recursively read directory trees. \\
+-A n, -B n, -C n & Include after, before, or surrounding context. \\
+-m n & Stop after a bounded number of selected lines per input. \\
+\bottomrule
+\end{longtable}
+
+\section{Status is a three-way contract}
+For common \texttt{grep} implementations:
+\begin{itemize}
+  \item 0: at least one line was selected;
+  \item 1: no line was selected;
+  \item greater than 1: an error occurred.
+\end{itemize}
+This matters in scripts. A simplistic \texttt{grep -q pattern file || echo absent} reports “absent” for both no-match and read failure. Handle them separately when reliability matters:
+\begin{lstlisting}
+if grep -qF 'READY' status.txt; then
+  printf 'ready\n'
+else
+  rc=$?
+  if (( rc == 1 )); then
+    printf 'not ready\n'
+  else
+    printf 'could not inspect status.txt\n' >&2
+    exit "$rc"
+  fi
+fi
+\end{lstlisting}
+
+\section{Recursive search boundaries}
+\begin{lstlisting}
+grep -RIn --exclude-dir=.git --include='*.py' 'TODO' .
+\end{lstlisting}
+GNU option meanings distinguish \texttt{-r} and \texttt{-R} in symbolic-link handling; consult the installed manual. Consider binary files, generated directories, large vendor trees, permission errors, and secrets in output. A source-code search tool such as \texttt{rg} is often faster and has developer-friendly defaults, but its ignore and encoding policies are also part of the result.
+
+\section{Counting what you actually mean}
+\texttt{grep -c} counts selected lines. To count matching fragments with GNU grep, \texttt{-o} prints each nonempty match on its own line, which can be piped to \texttt{wc -l}:
+\begin{lstlisting}
+grep -oF 'ERROR' app.log | wc -l
+\end{lstlisting}
+Be explicit whether the metric is files, lines, records, or occurrences.
+
+\section{Context and evidence}
+Context options make logs easier to interpret:
+\begin{lstlisting}
+grep -nC 2 -E 'ERROR|WARN' app.log
+\end{lstlisting}
+But context lines are not selected lines. When downstream automation consumes output, prefixes and separators can break parsing. Use human-oriented context for inspection and a stable format for machines.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- fixed versus regex}]
+Search for the literal text \texttt{a.b} in a file containing \texttt{axb} and \texttt{a.b}. Compare default regex matching with \texttt{-F}.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- precise recursion}]
+Create a small tree with source, build, and hidden VCS-like directories. Search only \texttt{.sh} files while excluding generated content. State every boundary encoded by your options.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- status-safe condition}]
+Write a Bash condition that distinguishes match, no match, and unreadable/missing input. Test all three paths and preserve the actual error code.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 10.1 -- Counting}]
+What does \texttt{grep -c pattern file} normally count?
+\fourchoices{Matching characters.}{Selected lines.}{All bytes read.}{Only distinct matches.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} It counts selected lines, which may contain more than one occurrence.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 10.2 -- Error handling}]
+Why can \texttt{grep -q x file || echo missing} be misleading?
+\fourchoices{\texttt{-q} always returns zero.}{The fallback also runs on operational errors, not only no-match.}{\texttt{||} tests stdout text.}{\texttt{grep} never opens files.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Both no-match and errors are nonzero. Reliable code distinguishes the documented statuses.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Treat \texttt{grep} as a line-selection predicate with output and status channels.
+  \item Use \texttt{-F} for literals and \texttt{-E} when ERE features are intended.
+  \item Define recursive boundaries and exclude generated or irrelevant trees.
+  \item Count the correct unit: files, lines, records, or occurrences.
+\end{itemize}
+\end{recapbox}
+
+\chapter{The Core Filter Toolkit}
+\chaptergoals{You can combine record and field tools, sort and deduplicate correctly, inspect stream boundaries, and use \texttt{xargs} and \texttt{tee} without data-loss assumptions.}
+
+\section{Small programs, explicit contracts}
+The Unix composition idea is not “always make a pipeline.” It is “use clear stages whose input/output contracts fit.” Common filters include:
+\begin{longtable}{>{\ttfamily}p{0.18\textwidth}p{0.74\textwidth}}
+\toprule
+Command & Core purpose \\
+\midrule
+\endfirsthead\toprule Command & Core purpose \\
+\midrule\endhead
+cat & Concatenate files to stdout; useful, but often unnecessary with a single input filename. \\
+head / tail & Select beginning/end; \texttt{tail -f} follows growth for observation. \\
+wc & Count lines, words, bytes, or characters depending on option. \\
+cut & Select delimiter-separated fields or character/byte ranges. \\
+paste & Merge corresponding lines from inputs. \\
+tr & Translate, delete, or squeeze characters. \\
+sort & Order records under key and locale rules. \\
+uniq & Collapse or report adjacent equal lines. \\
+tee & Copy stdin to files and stdout. \\
+xargs & Build command invocations from input items. \\
+od / xxd & Reveal byte-level content and invisible delimiters. \\
+column & Format fields for human-readable tables when available. \\
+\bottomrule
+\end{longtable}
+
+\section{Sorting and uniqueness}
+\texttt{uniq} compares adjacent lines only. Therefore a global frequency count usually sorts first:
+\begin{lstlisting}
+printf '%s\n' red blue red green blue red \
+  | LC_ALL=C sort \
+  | uniq -c \
+  | sort -nr
+\end{lstlisting}
+The final numeric reverse sort ranks counts. Leading spaces added by \texttt{uniq -c} are normally handled by numeric parsing, but machine interfaces should define the output format explicitly.
+
+Useful GNU \texttt{sort} concepts include \texttt{-n} numeric, \texttt{-h} human numeric, \texttt{-r} reverse, \texttt{-u} unique output, \texttt{-t} field delimiter, \texttt{-k} key definition, \texttt{-s} stable, and \texttt{-z} NUL-delimited records. Keys and locale can be subtle; test with representative data.
+
+\section{Fields with \texttt{cut}, \texttt{paste}, and \texttt{tr}}
+\begin{lstlisting}
+cut -d: -f1,7 /etc/passwd
+paste -d, names.txt scores.txt
+tr '[:lower:]' '[:upper:]' < labels.txt
+tr -s '[:space:]' ' ' < messy.txt
+\end{lstlisting}
+\texttt{cut -d} uses a single-character delimiter and is not CSV-aware. Repeated delimiters represent empty fields rather than arbitrary whitespace compression. Use \texttt{awk} or a structured parser when the format needs more.
+
+\section{\texttt{tee}: observe and continue}
+\begin{lstlisting}
+generate-report | tee report.txt | grep -nF 'WARN'
+\end{lstlisting}
+\texttt{tee} writes a copy to the file and continues the original stream. Default file behavior truncates; \texttt{-a} appends. In privileged workflows, \texttt{sudo command > protected-file} does not elevate the shell's redirection. A reviewed pipeline using privileged \texttt{tee} is one solution, but understand that it changes the protected file and requires appropriate authorization.
+
+\section{\texttt{xargs}: serialization into arguments}
+Default \texttt{xargs} parses blanks, quotes, and newlines using its own rules, which is unsafe for arbitrary filenames. Pair NUL producers and consumers:
+\begin{lstlisting}
+find . -type f -name '*.log' -print0 \
+  | xargs -0 -r -- sha256sum
+\end{lstlisting}
+GNU \texttt{-r} avoids running the command on empty input; this behavior is not universal. \texttt{-n} limits items per invocation, \texttt{-P} runs parallel jobs, and \texttt{-I} substitutes a placeholder but often implies a less efficient invocation pattern.
+
+Parallel execution changes ordering and introduces shared-resource concerns. Use it only when commands are independent and output interleaving is acceptable or controlled.
+
+\section{Case study: explain a frequency pipeline}
+\begin{lstlisting}
+ps aux | awk '{print $11}' | sort | uniq -c | sort -nr
+\end{lstlisting}
+Intent: list processes, select a command field, group identical adjacent values after sorting, count them, and rank numerically. Limitations: \texttt{ps aux} is human-oriented; field 11 can be absent on a header assumption or affected by format variations; command paths/arguments may not represent application identity. A more deliberate version selects a defined \texttt{ps} output column and removes the header:
+\begin{lstlisting}
+ps -eo comm= | LC_ALL=C sort | uniq -c | sort -nr
+\end{lstlisting}
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- adjacent uniqueness}]
+Feed unsorted repeated colors into \texttt{uniq -c}, then add \texttt{sort}. Explain the difference without using the word “magic.”
+\end{practicebox}
+\begin{practicebox}[title={Medium -- field contract}]
+Create colon-delimited records with one empty field. Use \texttt{cut} to select it, then compare with whitespace-oriented \texttt{awk}. Explain why delimiter choice is data schema.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- NUL pipeline}]
+Hash every regular file under a practice tree using \texttt{find -print0} and \texttt{xargs -0}. Include a filename with whitespace and one beginning with a hyphen; explain each safety option.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 11.1 -- \texttt{uniq}}]
+Why is \texttt{sort | uniq -c} a common pair?
+\fourchoices{\texttt{uniq} compares adjacent records.}{\texttt{sort} encrypts the input.}{\texttt{uniq} can read only numbers.}{Pipes require two commands.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} Sorting brings equal records together so adjacent comparison produces global groups.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 11.2 -- \texttt{xargs}}]
+Which design is safest for arbitrary filenames?
+\fourchoices{\texttt{find . | xargs command}}{\texttt{ls | xargs command}}{\texttt{find . -print0 | xargs -0 -- command}}{\texttt{echo * | xargs command}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{C.} NUL-delimited records preserve spaces and newlines. The option terminator protects against later option confusion when supported by the called utility.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Compose only when adjacent programs share an explicit record contract.
+  \item Sort before \texttt{uniq} for global grouping.
+  \item \texttt{cut} is simple-delimiter selection, not a general CSV parser.
+  \item Use NUL-delimited input for \texttt{xargs} when items are pathnames.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Transforming Text with \texttt{sed} and \texttt{awk}}
+\chaptergoals{You can choose between stream editing and record processing, write readable transformations, avoid in-place editing traps, and know when a real parser is required.}
+
+\section{Two complementary mental models}
+\begin{description}[style=nextline,leftmargin=2em]
+  \item[\texttt{sed}: select and edit a stream] For each input line, run editing commands: substitute, delete, print, append, or transform based on addresses.
+  \item[\texttt{awk}: pattern plus action over records and fields] For each record, split fields, test conditions, update variables, and print formatted results; use \texttt{BEGIN} and \texttt{END} for setup and summaries.
+\end{description}
+
+\section{\texttt{sed} substitution and addressing}
+\begin{lstlisting}
+sed 's/old/new/' input.txt          # first match per line
+sed 's/old/new/g' input.txt         # all nonoverlapping matches
+sed -n '/ERROR/p' app.log           # print only addressed lines
+sed '1,5d' input.txt                # delete lines 1 through 5 from output
+sed -E 's/[[:space:]]+/ /g' input.txt
+\end{lstlisting}
+The separator after \texttt{s} can often be another character, which improves path replacements:
+\begin{lstlisting}
+sed 's#/old/path#/new/path#g' file
+\end{lstlisting}
+Shell quotation and regex escaping are separate layers. Single quotes are simplest for static programs. To insert a shell variable, prefer a deliberate delimiter and escape data that could contain delimiter, backslash, or replacement metacharacters. For complex values, use another language or pass data outside source code.
+
+\section{In-place editing deserves a backup}
+\texttt{sed -i} syntax and backup behavior vary across GNU and BSD systems. It rewrites files rather than changing a stream. First preview without \texttt{-i}; then create version control or a backup; then verify.
+\begin{lstlisting}
+sed 's/^DEBUG=.*/DEBUG=false/' config.env > config.env.new
+diff -u config.env config.env.new
+mv -i config.env.new config.env
+\end{lstlisting}
+This explicit workflow is portable and reviewable.
+
+\section{\texttt{awk} records and fields}
+By default, \texttt{awk} treats each line as a record and runs of whitespace as field separators. \texttt{\$0} is the whole record, \texttt{\$1} the first field, \texttt{NF} the number of fields, and \texttt{NR} the record number.
+\begin{lstlisting}
+awk '{print NR, NF, $1}' input.txt
+awk -F: '$3 >= 1000 {print $1, $7}' /etc/passwd
+awk 'BEGIN {sum=0} {sum += $2} END {print sum}' scores.txt
+\end{lstlisting}
+Inside single-quoted Awk source, \texttt{\$1} is Awk field syntax, not shell expansion.
+
+\section{Formatting, aggregation, and state}
+\begin{lstlisting}
+awk -F, '
+  NR == 1 { next }
+  $3 == "ok" { count[$2]++; total[$2] += $4 }
+  END {
+    for (k in count)
+      printf "%-12s %6d %10.2f\n", k, count[k], total[k]
+  }
+' data.csv
+\end{lstlisting}
+This illustrates conditions, associative arrays, aggregation, and formatted output. It does \emph{not} correctly parse general CSV containing quoted commas or embedded newlines; use a CSV-aware parser for that data.
+
+\section{Passing shell values safely}
+Use \texttt{-v} to pass a shell value as Awk data rather than splicing it into program text:
+\begin{lstlisting}
+threshold=90
+awk -v min="$threshold" '$2 >= min {print $1, $2}' scores.txt
+\end{lstlisting}
+This separation reduces quotation bugs and code injection risks.
+
+\section{When to stop growing a one-liner}
+Move to a script or another language when you need nested structured data, robust error recovery, complex date/time handling, binary data, extensive testing, or a transformation that reviewers cannot explain. Brevity is valuable only while the data contract remains visible.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- substitution scope}]
+Create a line with three repeated words. Compare \texttt{sed 's/x/y/'} with the \texttt{g} flag and explain nonoverlapping replacement.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- aggregate}]
+Create whitespace-separated \texttt{name score} records. Use \texttt{awk} to print scores at least a chosen threshold and compute their average, guarding against division by zero.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- safe configuration edit}]
+Design a preview/diff/replace workflow that changes exactly one key in a practice configuration file. Detect zero or multiple matching keys and refuse to replace in those cases.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 12.1 -- Awk fields}]
+With default Awk splitting, what does \texttt{NF} represent?
+\fourchoices{The current filename only.}{The number of fields in the current record.}{The number of files opened.}{The next function.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} \texttt{NF} is the current record's field count; \texttt{NR} is the overall record number.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 12.2 -- Variable transfer}]
+Why prefer \texttt{awk -v limit="\$limit" '...'} to inserting the shell value directly into Awk source?
+\fourchoices{\texttt{-v} separates data from program text and simplifies quoting.}{Awk cannot read numbers otherwise.}{It forces every value to zero.}{It disables field splitting.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} Data/program separation is clearer and reduces syntax and injection problems.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item \texttt{sed} is strongest for addressed stream edits; \texttt{awk} for field-aware logic and aggregation.
+  \item Preview transformations before replacing files.
+  \item Pass shell data into Awk with \texttt{-v}.
+  \item Use format-aware parsers when the input format has quoting or nesting rules.
+\end{itemize}
+\end{recapbox}
+
+\part{Processes, Services, Logs, and Networks}
+
+\chapter{Processes, Jobs, and Signals}
+\chaptergoals{You can inspect processes, distinguish a process from a shell job, control foreground/background work, interpret load, and send the least disruptive signal.}
+
+\section{Process identity and relationships}
+A process is a running instance with a process ID (PID), parent PID, credentials, environment, working directory, open descriptors, memory mappings, and scheduling state. Threads share many resources within a process. A shell \term{job} is the shell's grouping of one or more pipeline processes for interactive control.
+
+\begin{lstlisting}
+ps -ef
+ps -eo pid,ppid,user,state,etimes,comm,args
+ps --forest -eo pid,ppid,stat,comm
+pstree -p
+\end{lstlisting}
+Prefer explicit \texttt{ps -o} columns for scripts and investigation. BSD-style \texttt{ps aux} is excellent for people but its fields and truncation should not be treated as a portable machine API.
+
+\section{Live views and measurement}
+\texttt{top} and \texttt{htop} show changing samples. CPU percentages depend on interval, core count, and tool convention. Memory columns distinguish virtual address space, resident pages, shared pages, and other categories; “free” memory alone is not a health score because Linux uses available memory for caches.
+
+Load average approximates demand for runnable or certain uninterruptible tasks over 1, 5, and 15 minutes. Interpret it relative to CPU capacity and workload. High load can arise from CPU demand or blocked I/O; it does not directly mean “percent CPU.”
+
+\begin{lstlisting}
+uptime
+free -h
+vmstat 1 5
+pidstat 1 5       # when the sysstat package is installed
+\end{lstlisting}
+Measurement changes over time. Take multiple samples, record timestamps, and compare against a known normal baseline.
+
+\section{Interactive job control}
+\begin{lstlisting}
+long-command &       # start in background
+jobs -l              # jobs known to this shell
+fg %1                # bring job 1 to foreground
+bg %1                # continue a stopped job in background
+wait %1              # wait and collect status
+\end{lstlisting}
+In an interactive shell, Ctrl-Z normally stops the foreground job; \texttt{bg} can continue it. Ctrl-C normally sends an interrupt signal to the foreground process group. Closing a terminal may send a hangup signal; \texttt{nohup}, terminal multiplexers, or a service manager provide different persistence models.
+
+\section{Signals are requests, not keyboard magic}
+\begin{lstlisting}
+kill -TERM 1234
+kill -HUP 1234
+kill -KILL 1234
+pkill -TERM -x exact-name
+\end{lstlisting}
+\texttt{kill} sends a signal. TERM requests orderly termination and is the normal first choice. HUP traditionally reports terminal loss and is also used by some daemons as a reload request. KILL cannot be caught or cleaned up; use it only after confirming identity and after graceful methods fail.
+
+\begin{warningbox}
+PID reuse and broad name matching can target the wrong process. Confirm user, start time, command, parent, and service ownership. If a process is managed by systemd, prefer \texttt{systemctl stop unit} to killing a child that the manager may immediately restart.
+\end{warningbox}
+
+\section{Exit, wait, and zombies}
+When a child exits, the kernel retains minimal status until the parent waits for it. That temporary entry is a zombie; it consumes a process-table slot but no running CPU. The fix is generally in the parent process's child-reaping logic, not repeatedly signaling the zombie. Orphans are reparented to an appropriate subreaper/init process.
+
+\section{Open resources}
+\begin{lstlisting}
+lsof -p 1234
+lsof -- /path/to/file
+ls -l /proc/1234/fd
+readlink /proc/1234/cwd
+\end{lstlisting}
+Permissions limit visibility. A deleted file may continue occupying storage while a process holds it open; \texttt{lsof +L1} is a common diagnostic on systems where supported.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- process portrait}]
+Start \texttt{sleep 60 \&}, capture \texttt{\$!}, inspect its PID/PPID/state/elapsed time, then wait for or terminate only that known practice process gracefully.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- jobs versus processes}]
+Start a two-stage background pipeline. Compare \texttt{jobs -l} with \texttt{ps}. Explain why one shell job can correspond to more than one process.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- evidence before signal}]
+Write a checklist and command sequence that verifies PID, user, elapsed time, parent, command, and service membership before sending TERM. Do not signal any process you did not start for the lab.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 13.1 -- Graceful termination}]
+Which signal is normally the first request for orderly termination?
+\fourchoices{KILL}{STOP}{TERM}{CONT}
+\end{questionbox}
+\begin{answerbox}
+\textbf{C.} TERM can be handled for cleanup. KILL is a last resort because it cannot be caught.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 13.2 -- Zombie state}]
+What primarily removes a zombie process-table entry?
+\fourchoices{The child consuming more CPU.}{Its parent collecting the exit status.}{Sending KILL repeatedly to the zombie.}{Deleting the executable file.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} The process has already exited; the parent must reap its status, or responsibility passes to a subreaper/init process.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Processes are kernel objects; jobs are shell control groupings.
+  \item Prefer explicit process columns and multiple samples.
+  \item Verify identity, then request graceful shutdown before force.
+  \item An open descriptor can keep deleted data allocated.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Services and Logs with systemd}
+\chaptergoals{You can inspect unit state, distinguish enablement from runtime activity, query journal logs precisely, and use machine-oriented properties in automation.}
+
+\section{Unit model}
+On many Linux distributions, systemd runs as the service manager. It manages units such as services, sockets, timers, mounts, paths, and targets. The installed system may use another init system; check PID 1 and distribution documentation.
+
+\begin{lstlisting}
+ps -p 1 -o comm=
+systemctl status ssh.service
+systemctl is-active ssh.service
+systemctl is-enabled ssh.service
+systemctl show ssh.service -p ActiveState -p SubState
+\end{lstlisting}
+\term{Active} describes current runtime state. \term{Enabled} describes whether unit installation links/configuration arrange startup under a target. A unit can be active but disabled, enabled but currently inactive, static, masked, or triggered by a socket/path/timer.
+
+\section{Human display versus machine interface}
+\texttt{systemctl status} is a rich human view and its formatting is not a stable parsing contract. Use \texttt{is-active}, \texttt{is-enabled}, or \texttt{show -p Property --value} in scripts. systemd's published stability guidance explicitly distinguishes human-readable status from machine-readable property output.
+
+\section{Safe lifecycle operations}
+\begin{lstlisting}
+systemctl status example.service
+systemctl cat example.service
+systemctl show example.service
+# Changing state usually requires authorization:
+sudo systemctl restart example.service
+\end{lstlisting}
+Before restarting a real service, determine impact, dependencies, active users, maintenance policy, and rollback. Prefer \texttt{reload} when the service supports configuration reload and a restart is unnecessarily disruptive. After editing unit files, \texttt{systemctl daemon-reload} asks the manager to reload unit definitions; it does not itself restart every service.
+
+\section{Journal queries}
+\begin{lstlisting}
+journalctl -u example.service
+journalctl -u example.service --since 'today'
+journalctl -u example.service -p warning..alert
+journalctl -b                 # current boot
+journalctl -b -1              # previous boot, if retained
+journalctl -f                 # follow new entries
+journalctl -o short-iso-precise
+\end{lstlisting}
+The journal stores fields such as unit, executable, PID, priority, boot ID, and message. Query by metadata rather than grepping formatted text when possible:
+\begin{lstlisting}
+journalctl _SYSTEMD_UNIT=example.service _PID=1234
+journalctl -u example.service -o json
+\end{lstlisting}
+JSON output still needs a JSON parser. Logs can contain untrusted text and secrets; quote exported values and apply appropriate access controls.
+
+\section{A disciplined service diagnosis}
+\begin{enumerate}
+  \item Define the symptom and time window.
+  \item Inspect unit state and last transition.
+  \item Read the unit file and drop-ins with \texttt{systemctl cat}.
+  \item Query journal entries around the event, including previous boot if relevant.
+  \item Inspect dependencies and ordering with \texttt{list-dependencies} and properties.
+  \item Validate configuration using the service's own checker when available.
+  \item Make one reversible change; verify state, logs, and user-visible behavior.
+\end{enumerate}
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- read-only unit portrait}]
+Choose a harmless existing unit and compare \texttt{status}, \texttt{is-active}, \texttt{is-enabled}, and selected \texttt{show} properties. Do not change its state.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- journal window}]
+Query one unit for the current boot and a narrow time range. Add priority filtering and export JSON for one entry; identify at least five metadata fields.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- build an evidence timeline}]
+Using read-only commands, build a timestamped timeline for a unit transition: state, unit definition/drop-ins, relevant journal entries, and dependencies. Mark observations separately from hypotheses.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 14.1 -- Enablement}]
+What does “enabled” most directly describe for a service unit?
+\fourchoices{It is running at this instant.}{Startup integration under unit configuration.}{Its logs have no errors.}{Its process uses less CPU.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Runtime activity and enablement are separate dimensions.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 14.2 -- Automation interface}]
+Which is most appropriate for a script checking unit state?
+\fourchoices{Parsing colored \texttt{systemctl status}.}{\texttt{systemctl is-active} or selected \texttt{show} properties.}{Taking a screenshot.}{Counting words in status output.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} These interfaces express state directly; human status formatting is not intended as a stable parser contract.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Unit type, activity, enablement, and triggering are distinct concepts.
+  \item Use property-oriented interfaces for automation.
+  \item Query the journal by unit, boot, time, priority, and metadata.
+  \item Diagnose with a timeline before changing service state.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Networking from the Command Line}
+\chaptergoals{You can separate link, address, route, DNS, transport, and application layers; inspect sockets; test each layer; and use SSH/curl with security-aware defaults.}
+
+\section{A layered troubleshooting model}
+“The network is down” is too broad. Test layers in order:
+\begin{enumerate}
+  \item interface/link: is the device present and up?
+  \item local addressing: does it have an expected address?
+  \item routing: where will packets to the target go?
+  \item name resolution: does the name resolve as expected?
+  \item transport: can TCP/UDP communication be established?
+  \item security middleboxes: firewall, proxy, VPN, policy, namespace?
+  \item application protocol: does HTTP, TLS, SSH, or the service itself behave correctly?
+\end{enumerate}
+
+\begin{lstlisting}
+ip -brief link
+ip -brief address
+ip route
+ip route get 203.0.113.10
+resolvectl status              # on supported systemd-resolved systems
+getent ahosts example.com
+\end{lstlisting}
+The documentation address \texttt{203.0.113.10} is reserved for examples. Actual commands should use approved targets.
+
+\section{Sockets with \texttt{ss}}
+\begin{lstlisting}
+ss -ltn
+ss -lun
+ss -ltnp
+ss -tan state established
+\end{lstlisting}
+Useful letters: \texttt{-l} listening, \texttt{-t} TCP, \texttt{-u} UDP, \texttt{-n} numeric, \texttt{-p} process information, \texttt{-a} all. Permissions and namespaces affect visibility.
+
+A listening address matters. \texttt{127.0.0.1:8080} is loopback-only; \texttt{0.0.0.0:8080} listens on all IPv4 local addresses; \texttt{[::]:8080} is an IPv6 wildcard whose IPv4 interaction depends on system settings. A listening socket does not prove an application-level request will succeed.
+
+\section{Name resolution}
+\begin{lstlisting}
+getent hosts example.com
+dig example.com A
+dig example.com AAAA
+dig +trace example.com        # diagnostic and potentially noisy
+\end{lstlisting}
+\texttt{getent} follows the system's configured name-service switch and may reflect local files or directory services. \texttt{dig} asks DNS-specific questions. A browser may use additional caches, proxies, encrypted DNS, or application rules.
+
+\section{Reachability and paths}
+\begin{lstlisting}
+ping -c 4 example.com
+tracepath example.com
+\end{lstlisting}
+Blocked ICMP does not prove the host or application is unavailable. Conversely, a successful ping does not prove TCP port 443 or the web application works. Each probe answers a limited question.
+
+\section{HTTP and TLS with \texttt{curl}}
+\begin{lstlisting}
+curl -I https://example.com/
+curl -fsS -o response.json https://example.com/api/status
+curl -w '%{http_code} %{time_total}\n' -o /dev/null -sS https://example.com/
+\end{lstlisting}
+Common ideas: \texttt{-I} requests headers, \texttt{-f} treats HTTP errors as command failure without displaying the body, \texttt{-sS} reduces progress noise while retaining errors, \texttt{-L} follows redirects, \texttt{-o} writes a file. Do not disable certificate verification as a routine fix. Inspect the hostname, time, CA trust, proxy, and certificate chain instead.
+
+Avoid putting passwords or API tokens directly in a command line; other users or logs may observe arguments. Use the application's protected credential mechanisms and avoid verbose traces containing secrets.
+
+\section{SSH mental model}
+SSH authenticates a server host key and then authenticates the user by an allowed method. The first protects against connecting to the wrong server; the second proves the client's identity.
+\begin{lstlisting}
+ssh user@host
+ssh -p 2220 user@host
+ssh -v user@host          # diagnostic; review output before sharing
+scp file user@host:/safe/destination/
+rsync -a --dry-run -e ssh ./local/ user@host:/remote/
+\end{lstlisting}
+Do not bypass a host-key change warning without independent verification; it can mean a rebuilt host, address reuse, or an interception risk. Private keys need restrictive file permissions. Use approved systems only.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- local socket inventory}]
+Use \texttt{ss -ltn} to list local TCP listeners. For one entry, identify address family, bind address, and port. Do not connect to unknown services.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- layered test}]
+For a permitted public site, record DNS resolution, route decision, and an HTTPS header response. State exactly what each success does and does not prove.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- port 8091 analysis}]
+Analyze \texttt{ss -ltnp | grep -q ':8091' || printf '8091 is free\textbackslash n'}. Identify false positives/negatives involving substring matching, IPv4/IPv6, permissions, namespaces, race conditions, and UDP. Propose a more precise observation while acknowledging it still cannot reserve the port.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 15.1 -- Listener scope}]
+What does a TCP listener on \texttt{127.0.0.1:8080} normally imply?
+\fourchoices{It accepts connections on every network interface.}{It is bound to IPv4 loopback.}{It is a UDP listener.}{The application has passed a health check.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Loopback binding limits ordinary reachability to the local host/network namespace. It says nothing about application health.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 15.2 -- Probe limits}]
+A host replies to \texttt{ping} but HTTPS fails. Which conclusion is valid?
+\fourchoices{DNS must be perfect.}{Basic ICMP reachability exists, while higher layers still need diagnosis.}{TLS is definitely using the wrong cipher.}{The web server is healthy.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Each probe covers a layer. Continue with name, route, TCP, TLS, proxy, and application evidence.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Diagnose networking by layer rather than with one all-purpose probe.
+  \item \texttt{ss} describes sockets; bind address and namespace define scope.
+  \item DNS, ICMP, TCP, TLS, and HTTP successes are different facts.
+  \item Preserve TLS verification and verify unexpected SSH host-key changes independently.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Storage, Packages, and System Facts}
+\chaptergoals{You can inspect block devices and filesystems without modifying them, distinguish package managers, discover installed ownership, and gather reproducible system facts.}
+
+\section{Storage layers}
+A typical storage path may involve a physical/virtual block device, partitions, encryption, RAID, logical volumes, a filesystem, a mount, and directory entries. Do not collapse these layers into “the disk.”
+
+Read-only inventory commands:
+\begin{lstlisting}
+lsblk -o NAME,TYPE,SIZE,FSTYPE,FSVER,LABEL,UUID,MOUNTPOINTS
+findmnt
+df -hT
+du -xsh /some/tree
+blkid                 # visibility may require authorization
+\end{lstlisting}
+Commands that partition, format, repair, encrypt, resize, or mount filesystems can destroy or expose data if misapplied. This handbook deliberately teaches inspection and planning, not a one-line storage mutation recipe.
+
+\section{Space and inode exhaustion}
+\texttt{df -h} checks blocks; \texttt{df -i} checks inodes. A filesystem can have free bytes but no free inodes due to huge numbers of small files. Use \texttt{du -x} to stay on one filesystem during a directory walk. Permission errors may hide usage.
+
+Deleted-but-open files are invisible to pathname walks but still allocate blocks. Check supported \texttt{lsof +L1} output and the responsible service; do not truncate a descriptor or restart production services without impact assessment.
+
+\section{Package-management families}
+Distribution families use different tools and package policies:
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.2\textwidth}>{\ttfamily}p{0.25\textwidth}X}
+\toprule
+Family & High-level tool & Common query examples \\
+\midrule
+Debian/Ubuntu & apt & \texttt{apt search name}; \texttt{apt show pkg}; \texttt{dpkg -S /path} \\
+Fedora/RHEL & dnf & \texttt{dnf search name}; \texttt{dnf info pkg}; \texttt{rpm -qf /path} \\
+Arch & pacman & \texttt{pacman -Ss name}; \texttt{pacman -Si pkg}; \texttt{pacman -Qo /path} \\
+openSUSE & zypper & \texttt{zypper search name}; \texttt{zypper info pkg}; \texttt{rpm -qf /path} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Query first. Installation/removal changes the system, can execute package scripts, and can affect dependencies and services. Use official repositories, review transactions, understand privilege, and follow the distribution's method. Do not mix package managers or copy commands across distributions blindly.
+
+\section{Who provided this command?}
+\begin{lstlisting}
+command -v ls
+readlink -f "$(command -v ls)"
+dpkg -S "$(command -v ls)"     # Debian-family example
+rpm -qf "$(command -v ls)"     # RPM-family example
+\end{lstlisting}
+Shell builtins do not belong to a separate executable package in the same way. Aliases and functions may shadow package files; resolve with \texttt{type -a} first.
+
+\section{System identification}
+\begin{lstlisting}
+uname -a
+cat /etc/os-release
+getconf LONG_BIT
+lscpu
+hostnamectl
+date --iso-8601=seconds
+\end{lstlisting}
+\texttt{uname} describes the running kernel, not the distribution release. \texttt{/etc/os-release} describes the operating-system image. Architecture can refer to kernel, hardware, or a particular executable; be precise.
+
+For a reproducible bug report, record command versions, locale, shell, environment variables relevant to the tool, input samples with sensitive data removed, exact status, stdout/stderr separation, time, and the smallest reproducer.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- read-only inventory}]
+Run \texttt{lsblk}, \texttt{findmnt}, and \texttt{df -hT}. Map the filesystem containing your lab directory back to a mount point and block device or virtual source.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- package ownership}]
+Determine how \texttt{/usr/bin/sort} is provided on your distribution using only query operations. Compare its package version with \texttt{sort --version} where supported.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- reproducibility capsule}]
+Create a text report containing timestamp, OS release, kernel, shell version, locale, and versions of Bash, grep, find, sed, and awk. Keep stdout/stderr explicit and avoid exposing usernames or host secrets if sharing it.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 16.1 -- Space layers}]
+Which command reports inode availability by filesystem?
+\fourchoices{\texttt{df -i}}{\texttt{du -h}}{\texttt{ls -i}}{\texttt{pwd -P}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} \texttt{df -i} reports inode totals/use where the filesystem exposes that concept.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 16.2 -- System identity}]
+Why is \texttt{uname -a} insufficient to identify a Linux distribution release?
+\fourchoices{It reports the running kernel/system information, not the distribution metadata.}{It prints only disk usage.}{It always changes the hostname.}{It requires a graphical session.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} Use \texttt{/etc/os-release} for distribution image metadata and \texttt{uname} for kernel/system details.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Storage is a stack: devices, volumes, filesystems, mounts, and paths.
+  \item Check both block and inode exhaustion and remember deleted-open files.
+  \item Package managers are distribution-specific; query and review before mutation.
+  \item Reproducibility requires versions, locale, inputs, streams, status, and time.
+\end{itemize}
+\end{recapbox}
+
+\part{Bash Scripting: From Commands to Programs}
+
+\chapter{Script Fundamentals, Parameters, and Data}
+\chaptergoals{You can create a script with a deliberate interpreter, handle arguments safely, use parameters and arrays, read input without damaging it, and separate configuration from code.}
+
+\section{A script is a language choice}
+\begin{lstlisting}
+#!/usr/bin/env bash
+
+printf 'hello from Bash %s\n' "$BASH_VERSION"
+\end{lstlisting}
+The shebang selects an interpreter when the file is executed directly. \texttt{/usr/bin/env bash} searches \texttt{PATH}, which is convenient but makes the selected interpreter environment-dependent. \texttt{/bin/bash} is explicit but not present at that path on every system. Choose based on deployment constraints and document the requirement.
+
+If the script promises POSIX \texttt{sh}, use \texttt{\#!/bin/sh} and avoid Bash-only features such as arrays, \texttt{[[ ... ]]}, process substitution, \texttt{source}, and \texttt{\&>}. Running \texttt{sh script} ignores a Bash shebang and asks \texttt{sh} to parse the file.
+
+\begin{lstlisting}
+chmod u+x report.sh
+./report.sh
+bash report.sh
+\end{lstlisting}
+The first form uses the shebang and needs execute permission. The second explicitly runs Bash and needs the file readable by Bash.
+
+\section{Positional parameters}
+\begin{longtable}{>{\ttfamily}p{0.19\textwidth}p{0.73\textwidth}}
+\toprule
+Parameter & Meaning \\
+\midrule
+\endfirsthead\toprule Parameter & Meaning \\
+\midrule\endhead
+\$0 & Invocation name/path as supplied. \\
+\$1 ... \$9 & Individual positional arguments; use braces for larger indices. \\
+\$\# & Number of positional arguments. \\
+"\$@" & All positional arguments, each preserved as a separate word. \\
+"\$*" & All positional arguments joined into one word using the first IFS character. \\
+\$? & Most recent foreground pipeline status. \\
+\$! & PID of the most recent asynchronous pipeline. \\
+\$\$ & PID associated with the shell; Bash details can differ in subshell contexts. \\
+\bottomrule
+\end{longtable}
+
+Correct argument iteration nearly always uses quoted \texttt{"\$@"}:
+\begin{lstlisting}
+for arg in "$@"; do
+  printf 'argument: %q\n' "$arg"
+done
+\end{lstlisting}
+Unquoted \texttt{\$*} or \texttt{\$@} can split and glob data, losing boundaries.
+
+\section{Usage and validation}
+\begin{lstlisting}
+usage() {
+  printf 'Usage: %s INPUT OUTPUT\n' "${0##*/}" >&2
+}
+
+if (( $# != 2 )); then
+  usage
+  exit 2
+fi
+
+input=$1
+output=$2
+[[ -r $input ]] || { printf 'not readable: %s\n' "$input" >&2; exit 1; }
+\end{lstlisting}
+Use status 2 conventionally for command-line usage errors when suitable. Validation is not merely checking that text is nonempty: consider type, existence, readability, destination collisions, parent permissions, allowed root, and whether symbolic-link behavior matches intent.
+
+\section{Variables and environment}
+A shell variable belongs to the shell. An exported variable is included in the environment passed to child processes.
+\begin{lstlisting}
+mode=development
+export LOG_LEVEL=info
+LOG_LEVEL=debug ./one-command
+readonly program_name=${0##*/}
+\end{lstlisting}
+Environment variables are strings, inherited copies, and observable by processes with appropriate access. They are convenient configuration, not always an appropriate secret store.
+
+Assignment syntax has no spaces around \texttt{=}. On the right side of a simple assignment, expansion behavior differs from ordinary argument contexts; quote for clarity and when a value later becomes an argument.
+
+\section{Bash arrays}
+\begin{lstlisting}
+files=("report one.txt" "report two.txt")
+files+=("report three.txt")
+
+for file in "${files[@]}"; do
+  printf '%s\n' "$file"
+done
+
+printf 'count=%d\n' "${#files[@]}"
+\end{lstlisting}
+Quoted \texttt{"\${array[@]}"} preserves one word per element. Associative arrays require declaration:
+\begin{lstlisting}
+declare -A score=([Ada]=98 [Linus]=95)
+printf '%s\n' "${score[Ada]}"
+\end{lstlisting}
+Array iteration order should not be assumed unless the script sorts keys.
+
+\section{Reading input}
+\begin{lstlisting}
+while IFS= read -r line || [[ -n $line ]]; do
+  printf 'line=%s\n' "$line"
+done < input.txt
+\end{lstlisting}
+\texttt{IFS=} preserves leading/trailing whitespace; \texttt{-r} stops backslash interpretation; the extra condition processes a final non-newline-terminated line. This loop still uses newline records and is not suitable for arbitrary pathnames; use NUL delimiting for those.
+
+Avoid \texttt{for line in \$(cat file)}. Command substitution removes trailing newlines, then unquoted output splits and globs, destroying record boundaries.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- argument boundaries}]
+Write a script that prints each argument with \texttt{printf '\%q\textbackslash n'}. Invoke it with spaces, an empty argument, and an asterisk. Verify that \texttt{"\$@"} preserves boundaries.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- validated copier}]
+Build a lab-only script accepting source and destination. Require exactly two arguments, readable source, and nonexisting destination; produce clear stderr messages and documented statuses.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- configuration precedence}]
+Design a script where a command-line option overrides an environment variable, which overrides a default. Print the chosen source without exposing sensitive values.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 17.1 -- Arguments}]
+Which expansion preserves every positional argument as its own word?
+\fourchoices{Unquoted \texttt{\$*}}{Quoted \texttt{"\$@"}}{Quoted \texttt{"\$\#"}}{\texttt{\$?}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Quoted \texttt{"\$@"} expands each positional parameter separately while preserving empty and whitespace-containing values.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 17.2 -- Interpreter}]
+What happens when a user runs \texttt{sh script-with-bash-shebang}?
+\fourchoices{The shebang always forces Bash.}{The explicitly invoked \texttt{sh} parses the file and may reject Bash syntax.}{The kernel converts Bash to POSIX.}{The script cannot read arguments.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} An explicit interpreter invocation controls parsing; the kernel's shebang mechanism is not used for that file execution.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Promise Bash or POSIX \texttt{sh} deliberately and write to that promise.
+  \item Preserve argument boundaries with quoted \texttt{"\$@"}.
+  \item Exported variables become child environment; ordinary variables do not.
+  \item Use arrays for lists in Bash, not space-separated strings.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Tests, Decisions, Loops, and Functions}
+\chaptergoals{You can write readable conditions, distinguish string/file/arithmetic tests, iterate without splitting bugs, design functions, and use \texttt{case} for grammar-like dispatch.}
+
+\section{Commands are conditions}
+Shell \texttt{if} tests a command's exit status, not a Boolean value printed to stdout:
+\begin{lstlisting}
+if grep -qF 'READY' status.txt; then
+  printf 'ready\n'
+else
+  printf 'not ready or unreadable\n'
+fi
+\end{lstlisting}
+For reliable code, distinguish expected negative results from operational errors as shown in Chapter 10.
+
+\section{\texttt{test}, \texttt{[ ]}, \texttt{[[ ]]}, and arithmetic}
+\texttt{[} is a command-like builtin whose final \texttt{]} is an argument; spaces are required. Bash \texttt{[[ ... ]]} is a compound command with safer string handling and pattern/regex features, but it is not POSIX.
+\begin{lstlisting}
+[ -r "$file" ]                 # POSIX-style test
+[[ -r $file ]]                  # Bash conditional
+[[ $name == *.log ]]            # pattern on unquoted right side
+[[ $value =~ ^[0-9]+$ ]]        # Bash regex condition
+(( count > 10 ))                # arithmetic condition
+\end{lstlisting}
+Inside \texttt{[[ ]]}, word splitting and pathname expansion are not performed on ordinary expansions, but quotation still changes pattern/regex meaning. Store complex regexes in variables and test on your Bash version.
+
+Common file tests:
+\begin{center}
+\begin{tabularx}{0.94\textwidth}{>{\ttfamily}p{0.15\textwidth}X >{\ttfamily}p{0.15\textwidth}X}
+\toprule
+-e & exists & -f & regular file \\
+-d & directory & -L & symbolic link \\
+-r & readable & -w & writable \\
+-x & executable/searchable & -s & nonempty size \\
+-nt & newer than & -ot & older than \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Tests can race with later operations. If security depends on “check then use,” prefer an operation that creates/opens atomically with the required conditions.
+
+\section{String and numeric comparisons}
+Use \texttt{=} or \texttt{!=} for portable string comparison in \texttt{[ ]}; use \texttt{-eq}, \texttt{-ne}, \texttt{-lt}, \texttt{-le}, \texttt{-gt}, \texttt{-ge} for integers. Bash arithmetic contexts use \texttt{==}, \texttt{<}, and related operators numerically.
+
+\begin{lstlisting}
+if [ "$mode" = production ]; then ...; fi
+if [ "$count" -gt 10 ]; then ...; fi
+if (( count > 10 )); then ...; fi
+\end{lstlisting}
+Do not use string \texttt{>} accidentally for numeric comparison; inside \texttt{[ ]}, it may also be parsed as redirection if unescaped in some forms.
+
+\section{\texttt{case}: dispatch by pattern}
+\begin{lstlisting}
+case ${1-} in
+  start|stop|status) action=$1 ;;
+  -h|--help) usage; exit 0 ;;
+  '') usage >&2; exit 2 ;;
+  *) printf 'unknown action: %s\n' "$1" >&2; exit 2 ;;
+esac
+\end{lstlisting}
+\texttt{case} patterns are shell patterns, not regular expressions. It is often clearer than a long chain of string comparisons.
+
+\section{Loops without data damage}
+\begin{lstlisting}
+for file in "$@"; do
+  process "$file"
+done
+
+for ((i=0; i<10; i++)); do
+  printf '%d\n' "$i"
+done
+
+while IFS= read -r line; do
+  process_line "$line"
+done < input.txt
+\end{lstlisting}
+A pipeline into \texttt{while} may run the loop in a subshell in Bash configurations, so variables changed inside may not persist. Redirect the loop or use process substitution when Bash is promised:
+\begin{lstlisting}
+count=0
+while IFS= read -r line; do
+  ((count++)) || true
+done < <(generate_lines)
+printf 'count=%d\n' "$count"
+\end{lstlisting}
+The \texttt{|| true} addresses a subtle interaction: \texttt{((count++))} returns status 1 when the expression evaluates to zero, which matters under \texttt{set -e}. Prefer \texttt{((++count))} if that status behavior is desired to remain successful from zero.
+
+\section{Functions and return channels}
+\begin{lstlisting}
+log() {
+  printf '%s [%s] %s\n' "$(date +%FT%T%z)" "$1" "$2" >&2
+}
+
+is_readable_file() {
+  [[ -f $1 && -r $1 ]]
+}
+\end{lstlisting}
+Functions receive positional parameters local to the call. Use \texttt{local} in Bash to avoid accidental global variables. A function's \texttt{return} accepts an exit status, not an arbitrary string. Return data through stdout only when stdout is the documented data channel; send logs to stderr.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- classify paths}]
+Write a \texttt{case}/test script that reports missing, directory, regular file, symbolic link, or other for each quoted argument.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- loop persistence}]
+Count generated lines using both \texttt{producer | while ...} and process-substitution input in Bash. Observe variable persistence and explain the process model.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- time-of-check race}]
+Explain why checking \texttt{[[ ! -e output ]]} and then creating \texttt{output} is not atomic. Research the installed tool or language interface you would use for exclusive creation; describe rather than applying it to important files.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 18.1 -- Shell condition}]
+What does \texttt{if command; then} test?
+\fourchoices{Whether stdout contains “true.”}{The command's exit status.}{Whether stderr is empty.}{The number of arguments.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Zero status selects the \texttt{then} branch.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 18.2 -- Pipeline loop}]
+Why might a variable changed inside \texttt{producer | while read ...} appear unchanged afterward in Bash?
+\fourchoices{\texttt{read} deletes variables.}{The loop may execute in a subshell environment.}{Pipes carry only numbers.}{\texttt{while} cannot assign variables.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Pipeline process boundaries can isolate shell state. Redirecting input to the loop or using Bash process substitution avoids relying on that pipeline state.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Shell conditions consume status, not printed Boolean text.
+  \item Use the correct comparison domain: file, string, pattern/regex, or arithmetic.
+  \item Iterate arrays and arguments with quoted expansions.
+  \item Keep function data, diagnostics, and status as separate channels.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Reliable Scripts: Errors, Traps, Temporary Files, and Security}
+\chaptergoals{You can design explicit failure behavior, understand strict-mode limits, clean up with traps, create temporary resources safely, and avoid injection-prone constructs.}
+
+\section{Reliability is a design, not one option}
+This popular Bash line is useful but not magic:
+\begin{lstlisting}
+set -Eeuo pipefail
+\end{lstlisting}
+\begin{itemize}
+  \item \texttt{-e}: exit on some unhandled nonzero statuses; many grammar contexts suppress or complicate it.
+  \item \texttt{-u}: treat many unset-parameter expansions as errors; optional values require deliberate defaults.
+  \item \texttt{pipefail}: make failures in nonfinal pipeline stages visible.
+  \item \texttt{-E}: make an ERR trap inherit in more Bash contexts.
+\end{itemize}
+Read the Bash manual's exact rules. Explicit \texttt{if ! command; then ...} handling remains clearer for expected failures. Never assume \texttt{-e} turns arbitrary shell code into exceptions.
+
+\section{A reliable skeleton}
+\begin{lstlisting}
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+program=${0##*/}
+tmpdir=
+
+cleanup() {
+  local rc=$?
+  if [[ -n ${tmpdir:-} && -d $tmpdir ]]; then
+    rm -rf -- "$tmpdir"
+  fi
+  exit "$rc"
+}
+trap cleanup EXIT
+trap 'printf "%s: interrupted\n" "$program" >&2; exit 130' INT
+trap 'printf "%s: terminated\n" "$program" >&2; exit 143' TERM
+
+tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/${program}.XXXXXXXX")
+readonly tmpdir
+\end{lstlisting}
+This example controls the temporary path returned by \texttt{mktemp}, quotes it, validates before recursive cleanup, and preserves the incoming status. Trap design is context-specific: signals, nested shells, multiple cleanup steps, and reentrancy need review.
+
+\section{Atomic replacement pattern}
+When updating a file, write a complete temporary file on the same filesystem, validate it, set required metadata, then rename it over the destination. A same-filesystem rename is commonly atomic with respect to observers, but durability after power loss requires filesystem-specific syncing discipline.
+\begin{lstlisting}
+tmp=$(mktemp "${target}.tmp.XXXXXXXX") || exit 1
+trap 'rm -f -- "${tmp:-}"' EXIT
+
+generate > "$tmp"
+validate "$tmp"
+chmod --reference="$target" "$tmp" 2>/dev/null || true
+mv -f -- "$tmp" "$target"
+tmp=
+\end{lstlisting}
+Do not use predictable \texttt{/tmp/name.\$\$} files; attackers or accidents can pre-create paths or links. Use \texttt{mktemp} and appropriate directory permissions.
+
+\section{Avoid \texttt{eval} and code/data confusion}
+\texttt{eval} reparses constructed text as shell code, multiplying quotation and injection risks. Use arrays to construct commands:
+\begin{lstlisting}
+cmd=(grep -nF)
+(( ignore_case )) && cmd+=(-i)
+cmd+=(-- "$pattern" "$file")
+"${cmd[@]}"
+\end{lstlisting}
+Never store a command with arguments in a single string and execute it unquoted. Shell arrays preserve boundaries.
+
+\section{Input, paths, and privilege boundaries}
+Treat filenames, environment values, configuration, and network responses as data, not shell source. Validate allowed domains, quote expansions, use \texttt{--}, set a controlled \texttt{PATH} for privileged/automated contexts, and call absolute paths only when deployment guarantees them.
+
+Avoid privilege when possible. If a script must cross a privilege boundary, minimize the elevated component, define exact inputs/outputs, clear untrusted environment influence, and review logging for secrets. Do not log tokens, passwords, private keys, or unredacted sensitive payloads.
+
+\section{Static and dynamic checks}
+\begin{lstlisting}
+bash -n script.sh       # syntax check only
+shellcheck script.sh    # when installed; analyze diagnostics, do not silence blindly
+bash -x script.sh       # execution trace; may expose secrets
+\end{lstlisting}
+Tests should cover empty input, spaces/newlines in names, leading hyphens, missing files, permission errors, partial output, failing pipeline stages, concurrent invocations, signals, and cleanup.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- strict-mode observation}]
+Write tiny isolated scripts showing \texttt{-u} on an unset value and \texttt{pipefail} on an early-stage failure. Record status and stderr.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- temporary cleanup}]
+Build a lab script using \texttt{mktemp -d} and an EXIT trap. Test success, a deliberate failure, and Ctrl-C; verify cleanup and status preservation.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- array command builder}]
+Create a safe search wrapper that conditionally adds fixed-string, ignore-case, and line-number options using an array. Test patterns and filenames containing spaces and leading hyphens.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 19.1 -- Command construction}]
+What is the safest normal way to build a Bash command with optional arguments?
+\fourchoices{Concatenate one string and use \texttt{eval}.}{Use an array and execute quoted \texttt{"\${cmd[@]}"}.}{Remove all quotation.}{Write the command into \texttt{/tmp/run}.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Arrays preserve argument boundaries and avoid reparsing data as code.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 19.2 -- \texttt{set -e}}]
+Which claim is accurate?
+\fourchoices{\texttt{set -e} catches every error in every Bash context.}{\texttt{set -e} has grammar-dependent exceptions, so expected failures still need explicit handling.}{\texttt{set -e} validates JSON.}{\texttt{set -e} quotes variables automatically.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Its semantics depend on command context. Reliability comes from designed error paths, validation, and tests.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Strict options improve visibility but do not replace explicit error design.
+  \item Use \texttt{mktemp}, traps, and verified target variables for cleanup.
+  \item Prefer write-validate-rename for replaceable file updates.
+  \item Arrays separate command arguments; \texttt{eval} collapses data into code.
+\end{itemize}
+\end{recapbox}
+
+\chapter{Discovery, Debugging, Automation, and the Fluency System}
+\chaptergoals{You can discover unfamiliar commands, debug by evidence, choose an automation mechanism, and follow a challenge-based practice loop that turns knowledge into fluency.}
+
+\section{The documentation ladder}
+Experts do not remember every option. They remember how to retrieve accurate details:
+\begin{enumerate}
+  \item \texttt{type -a name}: what will this shell run?
+  \item \texttt{help builtin}: Bash builtin syntax and semantics.
+  \item \texttt{command --help}: short implementation-specific overview.
+  \item \texttt{man command}: installed reference; use \texttt{/pattern}, \texttt{n}, \texttt{N}, and \texttt{q}.
+  \item \texttt{apropos concept} or \texttt{man -k concept}: discover manual pages by description.
+  \item \texttt{info command}: often the complete GNU manual.
+  \item project documentation and standards: versioned, authoritative detail.
+\end{enumerate}
+Manual sections disambiguate names: \texttt{man 1 printf} for the utility and \texttt{man 3 printf} for the C library function. Bash builtins are often described together in \texttt{help} and \texttt{man bash}.
+
+\section{A scientific debugging loop}
+\begin{enumerate}
+  \item \textbf{State the symptom.} Expected, observed, time, scope, and impact.
+  \item \textbf{Reduce.} Find the smallest input and command that reproduces it.
+  \item \textbf{Separate channels.} Capture stdout, stderr, and status independently.
+  \item \textbf{Inspect resolution.} Shell, command path, version, configuration, environment, locale.
+  \item \textbf{Trace the right layer.} \texttt{set -x} for shell expansion; service logs for daemons; \texttt{strace} for system calls where permitted; network capture only with authorization and privacy care.
+  \item \textbf{Change one variable.} Predict first, test, and record.
+  \item \textbf{Verify the fix and a negative case.} Prevent regression with a test.
+\end{enumerate}
+
+\section{Shell tracing without leaking secrets}
+\begin{lstlisting}
+PS4='+ ${BASH_SOURCE}:${LINENO}:${FUNCNAME[0]}: '
+BASH_XTRACEFD=9
+exec 9>trace.log
+set -x
+# traced commands here
+set +x
+\end{lstlisting}
+Tracing expands data and can expose credentials. Disable tracing around secrets, restrict trace permissions, and sanitize before sharing. \texttt{bash -n} checks syntax but does not prove runtime correctness.
+
+\section{Automation choices}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.2\textwidth}X X}
+\toprule
+Mechanism & Best fit & Key environment concern \\
+\midrule
+cron & Simple time schedules on systems using it & Minimal environment, working directory, mail/output handling \\
+systemd timer & Service-integrated schedules, dependencies, logging, persistence options & Unit user, sandboxing, calendar syntax, service status \\
+at & One-time deferred execution where available & Queue policy and captured environment \\
+CI scheduler & Repository/build workflows & Ephemeral runner, secrets, branch/revision, artifacts \\
+Shell loop & Short interactive monitoring & Lifetime, drift, failure handling; not a durable service \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Automated jobs do not inherit your interactive shell exactly. Set the working directory, PATH, locale, umask, interpreter, input/output locations, locking/concurrency policy, time zone, and failure notification explicitly.
+
+Example user-level systemd timer files should be tested in a disposable user environment and adapted to local policy:
+\begin{lstlisting}
+# ~/.config/systemd/user/lab-report.service
+[Unit]
+Description=Generate a practice report
+
+[Service]
+Type=oneshot
+ExecStart=%h/clm-lab/bin/report.sh
+
+# ~/.config/systemd/user/lab-report.timer
+[Unit]
+Description=Run the practice report daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+\end{lstlisting}
+Inspect with \texttt{systemd-analyze calendar daily}, then use user-level \texttt{systemctl --user} and \texttt{journalctl --user-unit} where supported. Do not schedule a job until its command is idempotent, bounded, logged, and safe under overlap.
+
+\section{The verb method}
+Translate intention into stages:
+\begin{center}
+\begin{tabularx}{0.9\textwidth}{>{\bfseries}p{0.32\textwidth}>{\ttfamily}p{0.22\textwidth}X}
+\toprule
+Intent & Candidate & Modifier \\
+\midrule
+see sockets & ss & listening, TCP, numeric, process \\
+select lines & grep & fixed/regex, case, context \\
+walk a tree & find & start, type, name, time, action \\
+order records & sort & key, numeric/text, locale, reverse \\
+summarize fields & awk & separator, condition, aggregation \\
+\bottomrule
+\end{tabularx}
+\end{center}
+For \texttt{ss -ltnp}, the memory is not the letters; it is the sentence “show listening TCP sockets numerically with process information.” The letters become retrieval cues.
+
+\section{The Bandit-style learning loop}
+OverTheWire Bandit uses levels for absolute beginners and directs learners toward manuals, builtin help, and research. Generalize the method without copying solutions:
+\begin{enumerate}
+  \item Read the goal and inventory known facts.
+  \item List candidate command families, not exact incantations.
+  \item Consult manuals and record only options relevant to the hypothesis.
+  \item Predict stdout, stderr, and status before running.
+  \item Test on the smallest safe input.
+  \item When stuck, identify the missing concept: quoting, permissions, paths, streams, encoding, networking, or process state.
+  \item After solving, write a one-sentence transferable rule and one altered practice case.
+\end{enumerate}
+Use only authorized learning systems. The objective is fluency with documentation and reasoning, not bypassing real-world access controls.
+
+\section{A 12-week mastery plan}
+\begin{longtable}{>{\bfseries}p{0.12\textwidth}p{0.38\textwidth}p{0.42\textwidth}}
+\toprule
+Weeks & Focus & Retrieval task \\
+\midrule
+\endfirsthead\toprule Weeks & Focus & Retrieval task \\
+\midrule\endhead
+1--2 & paths, command anatomy, help, quoting & Narrate ten commands token by token. \\
+3--4 & streams, status, pipelines, lists & Draw descriptors and predict status for ten pipelines. \\
+5--6 & files, permissions, find & Build and explain tree queries inside the lab. \\
+7--8 & grep, regex, filters, sed, awk & Transform one dataset with documented stage contracts. \\
+9--10 & processes, services, networking & Produce read-only evidence timelines for local observations. \\
+11--12 & Bash scripting, reliability, automation & Build, test, and schedule one harmless user-level report. \\
+\bottomrule
+\end{longtable}
+Daily practice can be 25 minutes: 5 minutes retrieval, 15 minutes a lab challenge, 5 minutes a learning log. Revisit misses after one day, one week, and one month.
+
+\section{Practice ladder}
+\begin{practicebox}[title={Easy -- documentation retrieval}]
+Find the manual section explaining one unfamiliar option without a web search. Record the command, search term used inside the manual, and one minimal example.
+\end{practicebox}
+\begin{practicebox}[title={Medium -- reproducible failure capsule}]
+Take a harmless failing lab command and capture command resolution, version, locale, exact arguments, stdout, stderr, and status. Write an observation/hypothesis table.
+\end{practicebox}
+\begin{practicebox}[title={Hard -- idempotent automation design}]
+Design a user-level daily report job. Specify inputs, outputs, lock/overlap behavior, temporary-file strategy, logs, failure status, environment, time zone, and verification. Run the script manually before considering a timer.
+\end{practicebox}
+
+\begin{questionbox}[title={Medium 20.1 -- Discovery}]
+Which command is best for learning whether \texttt{cd} is a builtin, alias, function, or file in the current shell?
+\fourchoices{\texttt{type -a cd}}{\texttt{df -h cd}}{\texttt{ping cd}}{\texttt{chmod cd}}
+\end{questionbox}
+\begin{answerbox}
+\textbf{A.} \texttt{type} asks the current shell about name resolution.
+\end{answerbox}
+
+\begin{questionbox}[title={Hard 20.2 -- Automation}]
+Why can a command succeed interactively but fail under cron or a timer?
+\fourchoices{Automated jobs cannot run programs.}{The environment, PATH, working directory, user, locale, and timing can differ.}{Pipelines are disabled after midnight.}{Manual pages change status codes.}
+\end{questionbox}
+\begin{answerbox}
+\textbf{B.} Automation must specify its execution context instead of assuming the interactive one.
+\end{answerbox}
+
+\begin{recapbox}
+\begin{itemize}
+  \item Documentation retrieval is a core technical skill.
+  \item Debug by separating evidence, hypothesis, layer, and controlled change.
+  \item Automation requires an explicit environment, concurrency policy, logging, and failure path.
+  \item The fluency loop is goal, hypothesis, manual, prediction, test, and transferable recap.
+\end{itemize}
+\end{recapbox}
+
+\appendix
+\part{Field Reference and Assessment}
+
+\chapter{Shell Grammar Cheat Sheet}
+\section{Parsing questions in the right order}
+For any unfamiliar line, annotate it with this checklist:
+\begin{enumerate}
+  \item What is quoted, escaped, or shell syntax?
+  \item Which expansions occur, and which are protected from splitting/globbing?
+  \item What command name resolves, and to what kind of command?
+  \item What strings become arguments after expansion?
+  \item Where do descriptors 0, 1, and 2 point after left-to-right redirection?
+  \item Which processes form a pipeline or job?
+  \item What status controls \texttt{if}, \texttt{\&\&}, \texttt{||}, or the caller?
+  \item What files, processes, services, or remote resources can change?
+\end{enumerate}
+
+\section{Operators and constructs}
+\begin{longtable}{>{\ttfamily}p{0.21\textwidth}p{0.71\textwidth}}
+\toprule
+Syntax & Meaning \\
+\midrule
+\endfirsthead\toprule Syntax & Meaning \\
+\midrule\endhead
+cmd arg & Simple command after assignments/expansions/redirections. \\
+a ; b & Run \texttt{a}, then \texttt{b} regardless of \texttt{a}'s status. \\
+a \&\& b & Run \texttt{b} only if \texttt{a} succeeds. \\
+a || b & Run \texttt{b} only if \texttt{a} fails. \\
+a | b & Connect \texttt{a} stdout to \texttt{b} stdin. \\
+cmd \& & Launch asynchronously; use job control or \texttt{wait}. \\
+( list ) & Execute a grouped list in a subshell environment. \\
+\{ list; \} & Group in the current shell; separators are required. \\
+\$(cmd) & Substitute captured stdout with trailing newlines removed. \\
+\$((expr)) & Arithmetic expansion. \\
+\${name:-word} & Default value without assignment if unset/null. \\
+\${name:?message} & Abort expansion with a diagnostic if unset/null. \\
+> file & Redirect stdout and truncate the file before execution. \\
+>> file & Redirect stdout and append. \\
+< file & Redirect stdin from a file. \\
+2> file & Redirect stderr. \\
+>file 2>\&1 & Both output streams to the file. \\
+<<EOF & Here-document; quotation of delimiter controls expansions. \\
+<<< word & Bash here-string: expanded word plus a newline to stdin. \\
+\mbox{[[ expr ]]} & Bash conditional compound command. \\
+(( expr )) & Bash arithmetic command; zero expression gives status 1. \\
+\bottomrule
+\end{longtable}
+
+\section{Quoting decision table}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.25\textwidth}X X}
+\toprule
+Need & Use & Example \\
+\midrule
+literal text & single quotes & \texttt{'\$HOME *.log'} \\
+expansion as one word & double quotes & \texttt{"\$HOME/report name"} \\
+one literal character & backslash & \texttt{space\textbackslash here} \\
+all arguments preserved & quoted at-sign & \texttt{"\$@"} \\
+all array elements preserved & quoted array at-sign & \texttt{"\${items[@]}"} \\
+intentional pathname expansion & unquoted glob only & \texttt{./*.log} \\
+regular expression as data & single quotes or variable & \texttt{grep -E '\textasciicircum{}[0-9]+\$'} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Status and stream reminders}
+\begin{itemize}
+  \item zero is conventional success; nonzero meanings are command-specific;
+  \item capture \texttt{\$?}, \texttt{\$!}, or \texttt{PIPESTATUS} immediately;
+  \item logs belong on stderr when stdout is a data interface;
+  \item default Bash pipeline status is the final stage; \texttt{pipefail} changes it;
+  \item redirection order is left-to-right;
+  \item \texttt{2>\&1} duplicates the destination currently held by descriptor 1.
+\end{itemize}
+
+\chapter{The Command Family Atlas}
+\section{Fifty essential commands}
+The exact options are not the memory goal. Remember the family, core verb, input/output contract, and how to retrieve installed details.
+
+\begin{longtable}{>{\ttfamily}p{0.16\textwidth}p{0.42\textwidth}p{0.32\textwidth}}
+\toprule
+Command & Core purpose & First useful query \\
+\midrule
+\endfirsthead\toprule Command & Core purpose & First useful query \\
+\midrule\endhead
+pwd & Print working directory. & \texttt{help pwd} \\
+cd & Change shell working directory. & \texttt{help cd} \\
+ls & List directory entries for people. & \texttt{man ls} \\
+stat & Report file metadata. & \texttt{man stat} \\
+file & Classify file content/type heuristically. & \texttt{man file} \\
+mkdir & Create directories. & \texttt{man mkdir} \\
+touch & Update timestamps/create missing file. & \texttt{man touch} \\
+cp & Copy files and trees. & \texttt{man cp} \\
+mv & Move or rename. & \texttt{man mv} \\
+rm & Remove directory entries/trees. & \texttt{man rm} \\
+ln & Create hard or symbolic links. & \texttt{man ln} \\
+find & Walk trees and evaluate expressions. & \texttt{man find} \\
+locate & Search a pathname database. & \texttt{man locate} \\
+du & Estimate selected tree usage. & \texttt{man du} \\
+df & Report filesystem capacity. & \texttt{man df} \\
+tar & Create, list, or extract archives. & \texttt{man tar} \\
+sha256sum & Compute/check SHA-256 digests. & \texttt{man sha256sum} \\
+cat & Concatenate files to stdout. & \texttt{man cat} \\
+less & Page through text interactively. & \texttt{man less} \\
+head & Select initial records/bytes. & \texttt{man head} \\
+tail & Select/follow final records. & \texttt{man tail} \\
+wc & Count lines, words, bytes, characters. & \texttt{man wc} \\
+grep & Select lines by pattern. & \texttt{man grep} \\
+sort & Order records by keys. & \texttt{man sort} \\
+uniq & Compare adjacent records. & \texttt{man uniq} \\
+cut & Select simple fields/ranges. & \texttt{man cut} \\
+paste & Merge corresponding lines. & \texttt{man paste} \\
+tr & Translate/delete/squeeze characters. & \texttt{man tr} \\
+tee & Copy a stream to files and stdout. & \texttt{man tee} \\
+xargs & Build invocations from input items. & \texttt{man xargs} \\
+sed & Edit selected stream records. & \texttt{man sed} \\
+awk & Process records/fields with rules. & \texttt{man awk} \\
+diff & Compare files or trees. & \texttt{man diff} \\
+ps & Snapshot process information. & \texttt{man ps} \\
+top & Interactive changing process view. & \texttt{man top} \\
+kill & Send a signal by PID/job. & \texttt{help kill} \\
+jobs & List jobs known to this shell. & \texttt{help jobs} \\
+fg / bg & Continue a job foreground/background. & \texttt{help fg}; \texttt{help bg} \\
+wait & Wait for jobs and collect status. & \texttt{help wait} \\
+systemctl & Inspect/control systemd units. & \texttt{man systemctl} \\
+journalctl & Query the systemd journal. & \texttt{man journalctl} \\
+ip & Inspect/configure links, addresses, routes. & \texttt{man ip} \\
+ss & Inspect sockets. & \texttt{man ss} \\
+getent & Query configured name-service databases. & \texttt{man getent} \\
+dig & Make DNS queries. & \texttt{man dig} \\
+ping & Probe ICMP reachability. & \texttt{man ping} \\
+curl & Transfer data using application protocols. & \texttt{man curl} \\
+ssh & Secure remote login/command transport. & \texttt{man ssh} \\
+rsync & Synchronize files/trees. & \texttt{man rsync} \\
+man & Read installed reference pages. & \texttt{man man} \\
+\bottomrule
+\end{longtable}
+
+\section{Filesystem quick reference}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.3\textwidth}X}
+\toprule
+Intent & Pattern \\
+\midrule
+show exact location & \texttt{pwd -P} \\
+inspect a directory entry & \texttt{ls -ld -- path} \\
+inspect metadata predictably & \texttt{stat -- path} \\
+find text files by name & \texttt{find root -type f -name '*.txt' -print} \\
+handle arbitrary matched names & \texttt{find ... -print0 | consumer -0} \\
+stay on one filesystem & \texttt{find root -xdev ...}; \texttt{du -x} \\
+preview cleanup selection & identical \texttt{find} expression ending in \texttt{-print} \\
+end option parsing & \texttt{command -- operand} \\
+compare trees & \texttt{diff -r -- a b} \\
+verify archive bytes & \texttt{sha256sum -c manifest} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Process and service quick reference}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.31\textwidth}X}
+\toprule
+Intent & Command shape \\
+\midrule
+defined process columns & \texttt{ps -eo pid,ppid,user,state,etimes,comm,args} \\
+live process sampling & \texttt{top}; \texttt{pidstat 1} if installed \\
+inspect open resources & \texttt{lsof -p PID}; \texttt{/proc/PID/fd} \\
+request graceful end & verify, then \texttt{kill -TERM PID} \\
+shell background jobs & \texttt{jobs -l}; \texttt{fg \%1}; \texttt{wait \%1} \\
+human unit overview & \texttt{systemctl status unit} \\
+machine unit state & \texttt{systemctl is-active unit}; \texttt{show -p ...} \\
+current-boot unit logs & \texttt{journalctl -b -u unit} \\
+time/priority log window & \texttt{journalctl --since ... -p warning..alert} \\
+unit definition/drop-ins & \texttt{systemctl cat unit} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Networking quick reference}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.28\textwidth}X}
+\toprule
+Layer & Read-only observation \\
+\midrule
+link & \texttt{ip -brief link} \\
+address & \texttt{ip -brief address} \\
+route & \texttt{ip route}; \texttt{ip route get TARGET} \\
+system resolver & \texttt{getent ahosts NAME} \\
+DNS-specific & \texttt{dig NAME A}; \texttt{dig NAME AAAA} \\
+ICMP reachability & \texttt{ping -c 4 NAME} \\
+local listeners & \texttt{ss -ltn}; \texttt{ss -lun} \\
+HTTP headers & \texttt{curl -I https://name/} \\
+HTTP status/timing & \texttt{curl -sS -o /dev/null -w '...'} \\
+SSH diagnosis & \texttt{ssh -v user@host} with output privacy review \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\chapter{Permissions, Regex, and Debugging Cards}
+\section{Permission card}
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.18\textwidth}X X}
+\toprule
+Bit & Regular file & Directory \\
+\midrule
+r (4) & read bytes & list names \\
+w (2) & modify bytes & create/remove/rename entries \\
+x (1) & request execution & traverse/search \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{multicols}{2}
+\textbf{Common modes}
+\begin{itemize}
+  \item \texttt{600}: private read/write file
+  \item \texttt{640}: owner read/write, group read
+  \item \texttt{644}: owner read/write, everyone read
+  \item \texttt{700}: private directory or executable
+  \item \texttt{750}: owner full, group read/traverse
+  \item \texttt{755}: owner full, everyone read/traverse
+\end{itemize}
+
+\columnbreak
+\textbf{Diagnosis order}
+\begin{enumerate}
+  \item \texttt{id}
+  \item \texttt{stat path}
+  \item \texttt{namei -l path}
+  \item \texttt{getfacl path}
+  \item mount options/read-only state
+  \item SELinux/AppArmor policy
+  \item only then consider authorized elevation
+\end{enumerate}
+\end{multicols}
+
+\section{Regex card}
+\begin{longtable}{>{\ttfamily}p{0.22\textwidth}p{0.34\textwidth}p{0.34\textwidth}}
+\toprule
+Intent & ERE & Shell glob contrast \\
+\midrule
+\endfirsthead\toprule Intent & ERE & Shell glob contrast \\
+\midrule\endhead
+any string & .* & * \\
+one character & . & ? \\
+literal dot & \textbackslash. & . \\
+line begins with x & \textasciicircum{}x & not an anchor in ordinary glob \\
+line ends with x & x\$ & not an anchor in ordinary glob \\
+digits only & \textasciicircum{}[[:digit:]]+\$ & +([0-9]) only with extglob \\
+one of a/b/c & [abc] & [abc] \\
+not a/b/c & [\textasciicircum{}abc] & [!abc] commonly \\
+x or y & (x|y) & @(x|y) only with Bash extglob \\
+literal pattern & \texttt{grep -F} & quote glob to keep literal \\
+\bottomrule
+\end{longtable}
+
+\textbf{Regex debugging:} state the dialect; single-quote static regex; start with a tiny controlled corpus; anchor when whole records matter; use \texttt{-F} if there are no regex requirements; test locale-sensitive classes; distinguish selected lines from occurrences.
+
+\section{Debugging card}
+\begin{enumerate}
+  \item Write exact expected and observed results.
+  \item Reproduce with the smallest safe input.
+  \item Print \texttt{type -a}, path, and version.
+  \item Capture stdout, stderr, and status separately.
+  \item Record shell, locale, working directory, user, environment, and time.
+  \item Expand the line mentally: quotes, variables, substitution, splitting, globbing.
+  \item Draw descriptors and pipeline stage statuses.
+  \item Inspect permissions on every path component.
+  \item For services, correlate state and journal by timestamp/boot.
+  \item For networks, move through link, address, route, name, transport, TLS, application.
+  \item Change one factor and predict the result.
+  \item Turn the fix into a positive and negative regression test.
+\end{enumerate}
+
+\section{The five refusal triggers}
+Pause before execution when any of these is true:
+\begin{enumerate}
+  \item the target path is empty, broad, unresolved, or built from untrusted text;
+  \item the command needs privilege but the reason is not understood;
+  \item the operation deletes, overwrites, formats, partitions, changes access, or restarts a real service without recovery planning;
+  \item network-fetched content is being treated as code or a credential would enter command history/logs;
+  \item you cannot state the expected stdout, stderr, status, and changed state.
+\end{enumerate}
+
+\chapter{Cumulative Exam: Medium and Hard}
+\section{Instructions}
+Every item has exactly one best answer. Work without a terminal first. For each choice, write one sentence explaining why it is right or wrong. Then verify uncertain items in a disposable lab and the installed manuals. Suggested timing: 60 minutes. Medium items are worth 1 point; hard items are worth 2 points; maximum score is 60.
+
+\begin{tcolorbox}[colback=Paper,colframe=Blue,title={Interpretation},fonttitle=\bfseries]
+\begin{itemize}
+  \item 51--60: fluent reasoning; proceed to project work and spaced review.
+  \item 41--50: strong foundation; revisit missed mechanisms, not just commands.
+  \item 30--40: developing; repeat the relevant labs and narrate expansions/streams.
+  \item below 30: restart Parts I--III with retrieval practice before scripting.
+\end{itemize}
+\end{tcolorbox}
+
+\section{Medium questions}
+\begin{questionbox}[title={Medium 1 -- Quoting}]
+If \texttt{name='Ada Lovelace'}, which form passes the value as one argument?
+\fourchoices{\texttt{command \$name}}{\texttt{command "\$name"}}{\texttt{command \$(name)}}{\texttt{command < \$name}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 2 -- Both output streams}]
+Which redirects both stdout and stderr to \texttt{run.log} in Bash/POSIX-style redirection?
+\fourchoices{\texttt{task >run.log 2>\&1}}{\texttt{task <run.log}}{\texttt{task | run.log}}{\texttt{task 1>\&2 run.log}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 3 -- Conditional execution}]
+What does \texttt{build \&\& deploy} mean?
+\fourchoices{Run both concurrently.}{Run \texttt{deploy} only if \texttt{build} succeeds.}{Send build output to deploy.}{Run deploy only if build fails.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 4 -- Name discovery}]
+Which is the best current-shell query for a script to locate an executable/builtin name?
+\fourchoices{\texttt{command -v name}}{\texttt{df name}}{\texttt{grep PATH name}}{\texttt{kill name}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 5 -- Option termination}]
+Why is \texttt{rm -- ./-draft} safer than \texttt{rm -draft}?
+\fourchoices{It enables recursive deletion.}{It identifies later text as an operand, not options.}{It creates a backup.}{It requires a GUI confirmation.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 6 -- \texttt{find} patterns}]
+Why is the pattern quoted in \texttt{find . -name '*.log'}?
+\fourchoices{To let the shell expand it immediately.}{To pass the pattern unchanged to \texttt{find}.}{To turn it into JSON.}{To disable recursion.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 7 -- Directory execute}]
+Execute permission on a directory primarily permits:
+\fourchoices{running every child file;}{traversing/searching the directory;}{editing every child regardless of other permissions;}{compressing the directory.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 8 -- Hard links}]
+Two hard links normally refer to:
+\fourchoices{independent copies;}{the same underlying filesystem object;}{two symbolic path strings;}{different mounted filesystems only.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 9 -- Counting duplicates}]
+Why usually place \texttt{sort} before \texttt{uniq -c}?
+\fourchoices{\texttt{uniq} compares adjacent lines.}{\texttt{sort} converts text to binary.}{\texttt{uniq} requires root.}{Pipelines require alphabetic output.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 10 -- Literal selection}]
+Which option requests fixed-string matching in GNU \texttt{grep}?
+\fourchoices{\texttt{-F}}{\texttt{-E}}{\texttt{-r}}{\texttt{-v}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 11 -- CSV caution}]
+Why is \texttt{cut -d,} not a complete parser for general CSV?
+\fourchoices{It cannot read stdin.}{It does not implement CSV quoting and embedded record rules.}{It always sorts fields.}{Commas are illegal delimiters.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 12 -- Awk fields}]
+In Awk, \texttt{\$0} normally means:
+\fourchoices{the current whole record;}{the first field;}{the shell PID;}{the output filename.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 13 -- Process scripting}]
+Which process query is clearest for machine-oriented fields?
+\fourchoices{\texttt{ps -eo pid,ppid,state,comm}}{\texttt{ps} with a screenshot}{\texttt{top | head} only}{parsing terminal colors from \texttt{ps aux}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 14 -- Service dimensions}]
+A systemd service can be active but disabled because:
+\fourchoices{activity and startup enablement are separate;}{disabled always means deleted;}{active means no process;}{systemd ignores unit state.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 15 -- Socket listing}]
+What does \texttt{ss -ltn} request?
+\fourchoices{Listening TCP sockets with numeric display.}{All UDP traffic with names.}{Filesystem locks.}{TLS certificate details.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 16 -- Inode capacity}]
+Which checks filesystem inode usage?
+\fourchoices{\texttt{df -i}}{\texttt{du -a}}{\texttt{ls -h}}{\texttt{stat -c \%s}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 17 -- Positional parameters}]
+Which expansion preserves positional-argument boundaries?
+\fourchoices{\texttt{"\$@"}}{unquoted \texttt{\$*}}{\texttt{\$\#}}{\texttt{\$?}}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 18 -- \texttt{case} language}]
+Bash \texttt{case} labels normally use:
+\fourchoices{shell patterns;}{SQL;}{JSONPath;}{only decimal arithmetic.}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 19 -- Temporary resources}]
+Which is the better starting point for a private temporary directory?
+\fourchoices{\texttt{mktemp -d}}{a predictable \texttt{/tmp/name.\$\$} path}{\texttt{touch /}}{a world-writable fixed filename}
+\end{questionbox}
+
+\begin{questionbox}[title={Medium 20 -- Manual sections}]
+What does \texttt{man 3 printf} request?
+\fourchoices{The section 3 library-function page.}{Three copies of the shell builtin.}{Only three lines.}{The third installed shell.}
+\end{questionbox}
+
+\section{Hard questions}
+\begin{questionbox}[title={Hard 21 -- Expansion boundaries}]
+If \texttt{x='*.log'} and matching files exist, what is the key difference between \texttt{printf '<\%s>\textbackslash n' \$x} and the quoted form?
+\fourchoices{The unquoted expansion may split and undergo pathname expansion; the quoted expansion stays one argument.}{Quotes disable parameter expansion entirely.}{Both always pass a literal dollar sign.}{The quoted form runs each file.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 22 -- Pipeline truth}]
+With \texttt{set -o pipefail}, a three-stage pipeline has statuses 2, 0, 0. What is the pipeline status in Bash?
+\fourchoices{0}{2}{the sum, 2 only by coincidence}{always 255}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 23 -- Left-to-right redirection}]
+What is normally true after \texttt{task 2>\&1 >out.log} when stdout initially points to the terminal?
+\fourchoices{Both streams go to the file.}{stderr points to the original terminal; stdout points to the file.}{Both become stdin.}{The command is a syntax error.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 24 -- \texttt{grep} protocol}]
+Why should reliable code not interpret every nonzero \texttt{grep} status as “no match”?
+\fourchoices{Operational errors use a distinct nonzero status.}{No-match returns zero.}{\texttt{grep} has no status.}{stderr is always empty.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 25 -- \texttt{find} precedence}]
+Which expression clearly selects regular files ending in either \texttt{.md} or \texttt{.txt}?
+\fourchoices{\texttt{find . -type f \textbackslash( -name '*.md' -o -name '*.txt' \textbackslash) -print}}{\texttt{find . -type f -name '*.md' -o -name '*.txt' -print} with no concern for precedence}{\texttt{ls | grep '*'}}{\texttt{find . | rm}}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 26 -- Filename protocol}]
+Why is \texttt{find ... -print0 | xargs -0 ...} preferred for arbitrary pathnames?
+\fourchoices{NUL cannot appear inside a pathname component.}{NUL makes every command privileged.}{Newline cannot travel through pipes.}{It automatically validates file contents.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 27 -- Moving across filesystems}]
+Why may \texttt{mv} across filesystems be more failure-prone than a same-filesystem rename?
+\fourchoices{It may need to copy data and then remove the source.}{Cross-filesystem paths have no names.}{It always reformats both filesystems.}{The shell disables status reporting.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 28 -- Creation modes}]
+With a umask of \texttt{027}, what mode commonly results when a program requests \texttt{666} for a regular file?
+\fourchoices{\texttt{640}}{\texttt{666}}{\texttt{777}}{\texttt{027}}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 29 -- Missing disk space}]
+Why can disk space remain used after a large log pathname is deleted?
+\fourchoices{A process may still hold the file open.}{\texttt{rm} compresses data.}{Directories never release blocks.}{\texttt{df} counts filenames only.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 30 -- Port race}]
+Why does a successful “port is free” check not reserve the port?
+\fourchoices{Another process can bind it after the observation.}{Ports cannot be observed.}{\texttt{ss} creates a permanent lock.}{TCP has no state.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 31 -- systemd parsing}]
+Why prefer \texttt{systemctl show -p ActiveState --value unit} over parsing \texttt{systemctl status}?
+\fourchoices{The property interface is intended for machine consumption.}{\texttt{status} never shows state.}{\texttt{show} restarts the unit.}{Properties are screenshots.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 32 -- TLS diagnosis}]
+What is the best routine response to a \texttt{curl} certificate verification failure?
+\fourchoices{Disable verification permanently.}{Investigate hostname, time, CA trust, proxy, and certificate chain.}{Send the private key on the command line.}{Switch to plain HTTP without review.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 33 -- SSH host identity}]
+An SSH host key unexpectedly changes. What is the safest next step?
+\fourchoices{Delete the warning and reconnect automatically.}{Verify the new fingerprint through an independent trusted channel.}{Post the private key publicly.}{Use a random username.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 34 -- Strict mode limits}]
+Which statement about Bash \texttt{set -e} is correct?
+\fourchoices{It has context-dependent exceptions and is not complete error handling.}{It quotes variables automatically.}{It validates external command output.}{It guarantees atomic file updates.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 35 -- Loop state}]
+Why can \texttt{count} fail to persist after \texttt{producer | while read ...; do ((count++)); done}?
+\fourchoices{The loop may run in a subshell.}{Integers cannot change in Bash.}{\texttt{read} always exits the parent.}{Pipelines remove variable names from source.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 36 -- Awk data injection}]
+Which safely passes a shell threshold as Awk data?
+\fourchoices{\texttt{awk -v min="\$threshold" '\$2 >= min \{print\}' file}}{Concatenate untrusted text into Awk source.}{Use \texttt{eval awk ...}.}{Export the whole script through a filename.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 37 -- Atomic replacement}]
+Why create a complete temporary file on the same filesystem before renaming it over a target?
+\fourchoices{Same-filesystem rename can provide an atomic visibility transition.}{It makes every write durable under any failure.}{It removes the need for validation.}{It bypasses permissions.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 38 -- Locale}]
+Why might a machine pipeline set \texttt{LC\_ALL=C} around \texttt{sort}?
+\fourchoices{To request reproducible bytewise collation.}{To translate all text to C source.}{To encrypt records.}{To make UTF-8 impossible system-wide.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 39 -- Checksum trust}]
+A download and its checksum arrive from the same compromised source. A match proves:
+\fourchoices{independent publisher authenticity;}{consistency with the supplied checksum, not independent trust;}{the file has no vulnerabilities;}{the source was never compromised.}
+\end{questionbox}
+
+\begin{questionbox}[title={Hard 40 -- Automation context}]
+Which is most important when moving an interactive command into a scheduled job?
+\fourchoices{Make PATH, user, working directory, locale, input/output, concurrency, and failure handling explicit.}{Assume the interactive shell profile always loads.}{Remove all logging.}{Ignore overlapping runs.}
+\end{questionbox}
+
+\section{Answer key with explanations}
+\begin{longtable}{>{\bfseries}p{0.08\textwidth}>{\bfseries\color{Blue}}p{0.08\textwidth}p{0.76\textwidth}}
+\toprule
+Q & Key & Reasoning \\
+\midrule
+\endfirsthead\toprule Q & Key & Reasoning \\
+\midrule\endhead
+1 & B & Double quotes allow parameter expansion while preserving the value as one word. \\
+2 & A & stdout is redirected first; stderr then duplicates stdout's file destination. \\
+3 & B & \texttt{\&\&} evaluates the right list only after zero status on the left. \\
+4 & A & \texttt{command -v} uses the current shell's resolution rules and is suitable for script checks. \\
+5 & B & \texttt{--} conventionally ends options, and \texttt{./} makes the operand explicit. \\
+6 & B & Quotation stops the shell's pathname expansion so \texttt{find} receives the pattern. \\
+7 & B & Directory execute means search/traversal, not permission to execute all contained files. \\
+8 & B & Hard-linked names map to the same underlying object rather than storing a target path. \\
+9 & A & Equal lines must be adjacent for \texttt{uniq} to group them; sorting creates that adjacency. \\
+10 & A & \texttt{-F} chooses fixed-string matching; \texttt{-E} chooses ERE. \\
+11 & B & General CSV has quoting, escaped delimiters, and possibly embedded newlines that simple delimiter splitting does not understand. \\
+12 & A & Awk \texttt{\$0} is the current record; \texttt{\$1} is its first field. \\
+13 & A & Explicit \texttt{-o} columns are a clearer contract than human-oriented layouts. \\
+14 & A & Active state describes now; enablement describes startup integration. \\
+15 & A & The letters mean listening, TCP, numeric. Process display would additionally use \texttt{-p}. \\
+16 & A & \texttt{df -i} reports inode capacity/use by filesystem. \\
+17 & A & Quoted \texttt{"\$@"} preserves one word per positional parameter, including empty ones. \\
+18 & A & \texttt{case} matches shell patterns, not regular expressions by default. \\
+19 & A & \texttt{mktemp -d} safely creates a unique directory rather than guessing a predictable path. \\
+20 & A & Manual section 3 traditionally covers library calls; section 1 covers user commands. \\
+21 & A & Unquoted expansion is subject to splitting and pathname expansion; quotes preserve one expanded word. \\
+22 & B & With \texttt{pipefail}, the rightmost failed stage determines the pipeline's nonzero status; here that is 2. \\
+23 & B & stderr duplicates stdout's original terminal destination before stdout is redirected to the file. \\
+24 & A & No-match and operational failure are distinct documented outcomes and should not share one message. \\
+25 & A & Parentheses make the name alternatives one group under the regular-file test; they must be protected from the shell. \\
+26 & A & NUL is the only byte excluded from pathname components, so it is an unambiguous delimiter. \\
+27 & A & A cross-filesystem move may require copying bytes and metadata, then removing the source, creating more partial-failure cases. \\
+28 & A & Requested 666 with mask 027 removes group write and all other permissions, yielding 640. \\
+29 & A & Removing the name does not end open file descriptions; storage is reclaimed after the last open reference closes. \\
+30 & A & Observation and binding are separate operations, leaving a time-of-check/time-of-use race. \\
+31 & A & Selected properties are documented machine-oriented state; status formatting is for people. \\
+32 & B & Preserve authentication and diagnose the underlying name, clock, trust, proxy, or chain problem. \\
+33 & B & Independent fingerprint verification distinguishes legitimate replacement from interception risk. \\
+34 & A & \texttt{-e} has detailed grammar-dependent rules; explicit handling and tests remain necessary. \\
+35 & A & Bash commonly runs pipeline elements in subshell environments, isolating variable changes. \\
+36 & A & \texttt{-v} passes a value as data and keeps it out of Awk program-source construction. \\
+37 & A & Same-filesystem rename can switch the visible name atomically, though durability and metadata still need design. \\
+38 & A & The C locale is often selected for stable bytewise collation, not for natural-language presentation. \\
+39 & B & A matching digest from the same untrusted channel is consistency evidence, not independent authenticity. \\
+40 & A & Scheduled contexts differ from interactive shells; every dependency and failure path must be explicit. \\
+\bottomrule
+\end{longtable}
+
+\chapter{Capstone Projects and Final Recap}
+\section{Capstone 1: Evidence-first log summarizer}
+Build a Bash program that accepts one or more log files and a fixed or regex pattern. Requirements:
+\begin{itemize}
+  \item preserve every filename boundary with arrays and quoted \texttt{"\$@"};
+  \item validate readable regular files and distinguish no-match from read error;
+  \item offer fixed-string and ERE modes without \texttt{eval};
+  \item emit a machine-readable summary on stdout and diagnostics on stderr;
+  \item control locale for reproducible sorting and document it;
+  \item test spaces, leading hyphens, empty files, missing final newline, no matches, and missing files.
+\end{itemize}
+
+\section{Capstone 2: Read-only service evidence bundle}
+For a harmless service on a lab machine, create a script that collects:
+\begin{itemize}
+  \item timestamp, OS/kernel/tool versions, unit state properties, definition/drop-ins;
+  \item journal entries for a bounded boot/time window;
+  \item relevant listening sockets and process portrait;
+  \item a manifest of output files and checksums;
+  \item a clear separation of observations and hypotheses.
+\end{itemize}
+Do not restart or reconfigure the service. Redact secrets before sharing.
+
+\section{Capstone 3: Safe, idempotent user report}
+Create a harmless report generator that can run twice without damage. Write to a temporary file, validate, rename into place, prevent unsafe overlap, log status, and run under an explicit environment. Only after manual tests, define a user-level timer or cron entry and verify its logs.
+
+\section{The one-page mental model}
+\begin{recapbox}[title={From syntax confusion to fluency}]
+\begin{enumerate}
+  \item The terminal carries characters; the shell parses a language; utilities receive arguments; the kernel provides system services.
+  \item Parse before memorizing: syntax, expansion, command resolution, arguments, descriptors, processes, and status.
+  \item Quote expansions by default. Use arrays for lists and NUL delimiters for arbitrary pathnames.
+  \item Pipes carry stdout data. Redirections wire descriptors. \texttt{\&\&} and \texttt{||} route control by status.
+  \item Treat every format as a contract: records, delimiters, encoding, locale, and structure.
+  \item Preview destructive selections, validate targets, preserve recovery, and use least privilege.
+  \item Diagnose by layer: paths/permissions, processes/services, storage, network, and application.
+  \item Scripts need explicit inputs, outputs, statuses, temporary resources, cleanup, concurrency, and interpreter promises.
+  \item Manuals are part of the skill. Retrieve, predict, test, and record a transferable rule.
+  \item A command you can explain and adapt is worth more than a hundred commands you can only copy.
+\end{enumerate}
+\end{recapbox}
+
+\section{Further authoritative reading}
+\begin{itemize}
+  \item William Shotts, \emph{The Linux Command Line}, Seventh Internet Edition: \url{https://linuxcommand.org/tlcl.php}
+  \item GNU Bash Reference Manual: \url{https://www.gnu.org/software/bash/manual/bash.html}
+  \item POSIX.1-2024 Shell and Utilities: \url{https://pubs.opengroup.org/onlinepubs/9799919799/}
+  \item GNU Coreutils Manual: \url{https://www.gnu.org/software/coreutils/manual/coreutils.html}
+  \item Linux man-pages: \url{https://man7.org/linux/man-pages/}
+  \item OverTheWire Bandit: \url{https://overthewire.org/wargames/bandit/}
+  \item systemd documentation: \url{https://systemd.io/}
+  \item The installed documentation on your system: \texttt{man}, \texttt{info}, \texttt{help}, and \texttt{--help}
+\end{itemize}
+
+\backmatter
+\chapter*{Production checklist}
+\addcontentsline{toc}{chapter}{Production checklist}
+Before trusting a command or script with real work, confirm:
+\begin{multicols}{2}
+\begin{itemize}
+  \item correct shell/interpreter;
+  \item command resolution and version;
+  \item quoted variables and preserved arrays;
+  \item option termination for path operands;
+  \item explicit data format and locale;
+  \item stdout/stderr/status contract;
+  \item pipeline failure policy;
+  \item bounded filesystem/network scope;
+  \item preview of destructive selection;
+  \item backup or rollback path;
+  \item least required privilege;
+  \item safe temporary resources;
+  \item cleanup on success/failure/signal;
+  \item concurrency and locking policy;
+  \item no credentials in arguments/logs;
+  \item positive, negative, and failure tests;
+  \item human-readable and machine-readable outputs distinguished;
+  \item documentation and usage text current;
+\end{itemize}
+\end{multicols}
+
+\vfill
+\begin{center}
+\color{Muted}\small
+Original instructional handbook generated as a LaTeX report.\\
+Source references verified 25 August 2026.\\
+Linux is a registered trademark of Linus Torvalds; other names belong to their respective owners.
+\end{center}
+
+\end{document}
